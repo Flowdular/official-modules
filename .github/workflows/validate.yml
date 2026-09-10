@@ -17,7 +17,8 @@ jobs:
         with:
           runtime: node@24
           cache: true
-          require-lockfile: false
+          install: false
+      - run: pnpm install --frozen-lockfile
       - run: pnpm verify
       - run: pnpm release:pack --local
       - uses: actions/upload-artifact@v4
@@ -47,7 +48,8 @@ jobs:
         with:
           runtime: node@24
           cache: true
-          require-lockfile: false
+          install: false
+      - run: pnpm install --frozen-lockfile
       # The runtime role must hold neither SUPERUSER nor BYPASSRLS, or the
       # adapter suites would pass against a database that never enforces RLS.
       - name: Create the migrator, runtime and background roles

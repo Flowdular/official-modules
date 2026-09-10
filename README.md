@@ -15,7 +15,7 @@ Install the modules your business needs, keep their source in your workspace, an
 
 This repository owns the official business modules and their versioned source releases. [Flowdular core](https://github.com/Flowdular/flowdular) owns authentication, the runtime, shared UI, agents, sandbox and CLI. The [website](https://github.com/Flowdular/landing) lives separately.
 
-> **Initial release:** the SDK packages required by this repository are awaiting their first npm publication. The commands below require those exact versions and the updated Flowdular CLI. All three modules currently declare experimental stability and platform API `0.1.0`.
+> **Compatibility:** this repository uses the published `@flowdular/sdk@0.1.0` and `flowdular@0.1.0`. All three modules currently declare experimental stability and platform API `0.1.0`.
 
 ## Available modules
 
@@ -98,7 +98,7 @@ pnpm verify
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for specifications, tests, review evidence and release steps. New modules start with an approved specification. Existing modules need tests that demonstrate their changed behavior and preserve public contracts.
 
-Before the initial SDK publication, maintainers can validate against tarballs produced by the core repository's `pnpm release:pack`. Temporary local overrides and their lock files must stay out of commits. After publication, generate and commit a portable `pnpm-lock.yaml` and enable `require-lockfile: true` in both CI jobs.
+Dependencies resolve from npm through the committed `pnpm-lock.yaml`. CI installs with `pnpm install --frozen-lockfile` in both jobs. Keep temporary local tarball overrides out of commits.
 
 CI runs module validation and tests, plus a PostgreSQL job with restricted runtime roles. See the [initial transfer review](docs/reviews/initial-transfer.md) for the extraction evidence.
 
