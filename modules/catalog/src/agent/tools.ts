@@ -1,10 +1,10 @@
-import { defineApiAgentTool } from '@flowdular/harness/tool-adapters';
+import { defineApiAgentTool } from '@flowdular/sdk/harness/tool-adapters';
 import {
 	AgentHarnessError,
 	type AgentTool,
 	type AgentToolContext,
-} from '@flowdular/harness/runtime';
-import { agentActor, type Actor } from '@flowdular/kernel';
+} from '@flowdular/sdk/harness/runtime';
+import { agentActor, type Actor } from '@flowdular/sdk/kernel';
 import { CATALOG_PERMISSIONS } from '../acl/permissions.ts';
 import type { CatalogItemKind } from '../domain/types.ts';
 import type { CatalogRuntime } from '../server/runtime.ts';

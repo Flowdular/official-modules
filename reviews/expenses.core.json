@@ -1,20 +1,21 @@
 {
-	"sourceSha256": "c6ca28bc94d7c44905946413177ceb5f283c0ebd1439849a65693d204cb8d7be",
+	"sourceSha256": "e4ecabf1d4e48e0f9dfe01c74686a6f3f049fffd778ec0ef3bcb8140b02fc6c1",
 	"requirements": [
 		"Preserve source behavior, permissions and migrations byte-for-byte during repository transfer.",
 		"Resolve dependencies from the packed Flowdular SDK in an independent workspace.",
-		"Pass module typecheck, behavior tests and manifest/layout/dependency validation."
+		"Pass module typecheck, behavior tests and manifest/layout/dependency validation.",
+		"Consume the shared @flowdular/sdk package with public subpath imports, without individually published core packages."
 	],
 	"findings": [],
 	"checks": [
 		{
 			"name": "typecheck",
-			"command": "pnpm --filter @flowdular/module-expenses typecheck",
+			"command": "pnpm typecheck",
 			"exitCode": 0
 		},
 		{
 			"name": "test",
-			"command": "pnpm --filter @flowdular/module-expenses test",
+			"command": "pnpm test",
 			"exitCode": 0
 		},
 		{

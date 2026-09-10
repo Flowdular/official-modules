@@ -1,7 +1,7 @@
 import {
 	AUTH_PRINCIPAL_STATE_KEY,
 	type AuthRuntime,
-} from '@flowdular/module-auth/server';
+} from '@flowdular/sdk/modules/auth/server';
 import { afterAll, afterEach, describe, expect, it } from 'vitest';
 import { PARTY_PERMISSIONS } from '../src/acl/permissions.ts';
 import { createPartyRoutes } from '../src/api/endpoints.ts';
@@ -87,7 +87,7 @@ function principal(scopes: readonly string[], tenantId = 'tenant-a') {
 
 /* auth.core resolves the browser session in its middleware and publishes it in
    context state; sessionMutationDenial reads it from there. The key is not yet
-   exported from @flowdular/module-auth/server, so this double mirrors it. */
+   exported from @flowdular/sdk/modules/auth/server, so this double mirrors it. */
 const AUTH_SESSION_STATE_KEY = 'flowdular.auth.session';
 
 function signIn(

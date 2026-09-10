@@ -1,5 +1,5 @@
 import { cell, createStore } from 'segment-state';
-import type { HistoryEntry } from '@flowdular/kernel';
+import type { HistoryEntry } from '@flowdular/sdk/kernel';
 import type { ExpenseClaimDecision, ExpensesClaim } from '../domain/types.ts';
 import type { ExpenseStatusFilter } from './expense-claims.ts';
 

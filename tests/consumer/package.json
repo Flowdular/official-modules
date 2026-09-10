@@ -8,12 +8,9 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
-		"@flowdular/database": "0.1.0",
-		"@flowdular/database-testing": "0.1.0",
-		"@flowdular/kernel": "0.1.0",
-		"@flowdular/harness": "0.1.0",
 		"@flowdular/module-catalog": "workspace:*",
-		"@flowdular/module-parties": "workspace:*"
+		"@flowdular/module-parties": "workspace:*",
+		"@flowdular/sdk": "0.1.0"
 	},
 	"devDependencies": {
 		"@types/node": "24.13.3",

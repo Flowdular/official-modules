@@ -12,8 +12,8 @@
 		"release:pack": "node scripts/build-release.mjs"
 	},
 	"devDependencies": {
-		"@flowdular/cli": "0.1.0",
 		"prettier": "3.6.2",
-		"@tsrx/prettier-plugin": "0.3.120"
+		"@tsrx/prettier-plugin": "0.3.120",
+		"flowdular": "0.1.0"
 	}
 }

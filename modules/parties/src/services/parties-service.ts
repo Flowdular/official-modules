@@ -4,7 +4,7 @@ import {
 	type Actor,
 	type HistoryPage,
 	type HistoryRequest,
-} from '@flowdular/kernel';
+} from '@flowdular/sdk/kernel';
 import type {
 	CreatePartyInput,
 	Party,

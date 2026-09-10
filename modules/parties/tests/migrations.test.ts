@@ -2,13 +2,13 @@ import { readdirSync, readFileSync } from 'node:fs';
 import type {
 	DatabaseAdapterLease,
 	DatabaseProvider,
-} from '@flowdular/database';
+} from '@flowdular/sdk/database';
 import {
 	DATABASE_MIGRATION_LEDGER,
 	databaseMigrationStatus,
 	runDatabaseMigrations,
-} from '@flowdular/database';
-import { createTestDatabaseProvider } from '@flowdular/database-testing';
+} from '@flowdular/sdk/database';
+import { createTestDatabaseProvider } from '@flowdular/sdk/database-testing';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { databaseMigrations } from '../src/services/migration.ts';
 

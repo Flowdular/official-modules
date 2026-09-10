@@ -1,7 +1,7 @@
 import type {
 	ModuleClientContext,
 	ModuleClientContribution,
-} from '@flowdular/client';
+} from '@flowdular/sdk/client';
 import { createExpensesClientContribution as canonicalContribution } from './contribution.tsrx';
 
 export { createExpensesClientContribution } from './contribution.tsrx';

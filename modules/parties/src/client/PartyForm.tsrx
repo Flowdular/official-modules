@@ -1,6 +1,6 @@
 import { useMemo } from 'octane';
-import { Alert, Button, FormField } from '@flowdular/ui';
-import { t } from '@flowdular/client';
+import { Alert, Button, FormField } from '@flowdular/sdk/ui';
+import { t } from '@flowdular/sdk/client';
 import { cell, createStore, useValue } from 'segment-state';
 import type { Party, PartyKind } from '../domain/types.ts';
 

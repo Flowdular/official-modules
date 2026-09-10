@@ -3,7 +3,7 @@ import {
 	registerModuleTranslations,
 	setActiveLocale,
 	t,
-} from '@flowdular/client/i18n';
+} from '@flowdular/sdk/client/i18n';
 import translationsEn from '../translations/en.json';
 import translationsPl from '../translations/pl.json';
 import { catalogNavigationLabel } from '../src/client/navigation-copy.ts';

@@ -2,7 +2,7 @@ import type {
 	ExpenseClaimCategory,
 	ExpenseClaimStatus,
 } from '../domain/types.ts';
-import { activeLocale, t } from '@flowdular/client/i18n';
+import { activeLocale, t } from '@flowdular/sdk/client/i18n';
 
 export type ExpenseStatusFilter = 'all' | ExpenseClaimStatus;
 export type ExpenseStatusTone = 'neutral' | 'success' | 'warning' | 'danger';

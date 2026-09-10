@@ -12,8 +12,8 @@ import {
 	TableCard,
 	Tag,
 	type TableColumn,
-} from '@flowdular/ui';
-import { activeLocale, t } from '@flowdular/client';
+} from '@flowdular/sdk/ui';
+import { activeLocale, t } from '@flowdular/sdk/client';
 import { cell, createStore, useValue } from 'segment-state';
 import type { Party, PartyKind } from '../domain/types.ts';
 import {

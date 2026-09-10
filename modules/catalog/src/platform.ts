@@ -1,8 +1,8 @@
 import type {
 	PlatformServerComposition,
 	PlatformServerContext,
-} from '@flowdular/module-auth/server';
-import { platformVariableRegistry } from '@flowdular/kernel';
+} from '@flowdular/sdk/modules/auth/server';
+import { platformVariableRegistry } from '@flowdular/sdk/kernel';
 import { registerCatalogVariableSource } from './domain/variables.ts';
 import {
 	catalogAgentTools,

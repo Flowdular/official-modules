@@ -1,7 +1,7 @@
 import type {
 	PlatformServerComposition,
 	PlatformServerContext,
-} from '@flowdular/module-auth/server';
+} from '@flowdular/sdk/modules/auth/server';
 import { createExpensesRoutes, createExpensesRuntime } from './server/index.ts';
 
 export function createServerComposition(

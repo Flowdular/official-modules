@@ -3,8 +3,8 @@ import type {
 	ExpenseClaimDecision,
 	ExpensesClaim,
 } from '../domain/types.ts';
-import { t } from '@flowdular/client/i18n';
-import type { HistoryPage } from '@flowdular/kernel';
+import { t } from '@flowdular/sdk/client/i18n';
+import type { HistoryPage } from '@flowdular/sdk/kernel';
 import type { ExpenseStatusFilter } from './expense-claims.ts';
 
 interface ErrorEnvelope {

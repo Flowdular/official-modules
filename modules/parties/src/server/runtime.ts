@@ -2,11 +2,11 @@ import type {
 	DatabaseAdapterLease,
 	DatabaseProvider,
 	DatabaseProviderRequest,
-} from '@flowdular/database';
+} from '@flowdular/sdk/database';
 import {
 	DATABASE_CAPABILITY_IDS,
 	DATABASE_DIALECT_IDS,
-} from '@flowdular/database';
+} from '@flowdular/sdk/database';
 import { PartiesService } from '../services/parties-service.ts';
 import {
 	DatabasePartyRepository,

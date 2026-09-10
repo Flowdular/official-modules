@@ -1,4 +1,4 @@
-import type { Actor, HistoryPage, HistoryQuery } from '@flowdular/kernel';
+import type { Actor, HistoryPage, HistoryQuery } from '@flowdular/sdk/kernel';
 import type { CatalogItem } from '../domain/types.ts';
 import type { TargetIdempotencyRequest } from './target-idempotency.ts';
 

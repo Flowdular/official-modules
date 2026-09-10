@@ -2,7 +2,7 @@ import {
 	registerModuleTranslations,
 	setActiveLocale,
 	t,
-} from '@flowdular/client/i18n';
+} from '@flowdular/sdk/client/i18n';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { loadPartyHistory } from '../src/client/api.ts';
 import translationsEn from '../translations/en.json';

@@ -1,5 +1,5 @@
 import type { Party } from '../domain/types.ts';
-import { activeLocale } from '@flowdular/client/i18n';
+import { activeLocale } from '@flowdular/sdk/client/i18n';
 
 export function filterParties(
 	parties: readonly Party[],

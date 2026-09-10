@@ -5,7 +5,7 @@ export { PartyHistoryDrawer } from './PartyHistoryDrawer.tsrx';
 import type {
 	ModuleClientContext,
 	ModuleClientContribution,
-} from '@flowdular/client';
+} from '@flowdular/sdk/client';
 import { createPartiesClientContribution as canonicalContribution } from './contribution.tsrx';
 
 /* Canonical entry used by the generated platform composition. */

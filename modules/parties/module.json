@@ -3,7 +3,7 @@
 	"schemaVersion": 1,
 	"id": "parties.core",
 	"package": "@flowdular/module-parties",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"profile": "full",
 	"capabilities": ["api", "database", "client", "translations"],
 	"platform": {

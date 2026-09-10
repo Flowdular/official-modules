@@ -1,4 +1,4 @@
-import type { ModuleClientContribution } from '@flowdular/client';
+import type { ModuleClientContribution } from '@flowdular/sdk/client';
 import { CATALOG_PERMISSIONS } from '../acl/permissions.ts';
 import translationsEn from '../../translations/en.json';
 import translationsPl from '../../translations/pl.json';

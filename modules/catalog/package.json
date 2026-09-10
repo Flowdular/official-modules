@@ -1,6 +1,6 @@
 {
 	"name": "@flowdular/module-catalog",
-	"version": "0.6.0",
+	"version": "0.6.1",
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
@@ -14,19 +14,11 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
-		"@flowdular/client": "0.1.0",
-		"@flowdular/contracts": "0.1.0",
-		"@flowdular/database": "0.1.0",
-		"@flowdular/harness": "0.1.0",
-		"@flowdular/kernel": "0.1.0",
-		"@flowdular/module-auth": "0.10.0",
-		"@flowdular/server": "0.1.0",
-		"@flowdular/ui": "0.1.0",
 		"octane": "0.1.51",
-		"segment-state": "0.2.0"
+		"segment-state": "0.2.0",
+		"@flowdular/sdk": "0.1.0"
 	},
 	"devDependencies": {
-		"@flowdular/database-testing": "0.1.0",
 		"@tsrx/typescript-plugin": "0.3.120",
 		"@types/node": "24.13.3",
 		"typescript": "5.9.3",

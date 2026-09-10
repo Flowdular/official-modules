@@ -1,6 +1,6 @@
-import type { DatabaseProvider } from '@flowdular/database';
-import { validateToolInput, validateToolOutput } from '@flowdular/harness';
-import type { AgentToolContext } from '@flowdular/harness/runtime';
+import type { DatabaseProvider } from '@flowdular/sdk/database';
+import { validateToolInput, validateToolOutput } from '@flowdular/sdk/harness';
+import type { AgentToolContext } from '@flowdular/sdk/harness/runtime';
 import { afterAll, afterEach, describe, expect, it } from 'vitest';
 import { catalogAgentTools } from '../src/agent/tools.ts';
 import type { CatalogItem } from '../src/domain/types.ts';
@@ -8,7 +8,10 @@ import {
 	createCatalogRuntime,
 	type CatalogRuntime,
 } from '../src/server/runtime.ts';
-import { agentActor, createPlatformVariableRegistry } from '@flowdular/kernel';
+import {
+	agentActor,
+	createPlatformVariableRegistry,
+} from '@flowdular/sdk/kernel';
 import { CATALOG_PERMISSIONS } from '../src/acl/permissions.ts';
 import { registerCatalogVariableSource } from '../src/domain/variables.ts';
 import {

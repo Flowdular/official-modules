@@ -8,16 +8,12 @@
 		"isolatedModules": true,
 		"jsx": "react-jsx",
 		"jsxImportSource": "octane",
-		"types": [
-			"node"
-		],
+		"types": ["node"],
 		"plugins": [
 			{
 				"name": "@tsrx/typescript-plugin"
 			}
 		]
 	},
-	"include": [
-		"*.ts"
-	]
+	"include": ["*.ts"]
 }

@@ -1,4 +1,4 @@
-import { createPlatformToolRegistry, userActor } from '@flowdular/kernel';
+import { createPlatformToolRegistry, userActor } from '@flowdular/sdk/kernel';
 import {
 	AgentHarness,
 	LocalSimulationProvider,
@@ -6,7 +6,7 @@ import {
 	type AgentExecutionRequest,
 	type AgentProvider,
 	type AgentTool,
-} from '@flowdular/harness';
+} from '@flowdular/sdk/harness';
 import {
 	catalogAgentTools,
 	createCatalogRuntime,
@@ -15,8 +15,8 @@ import {
 	createPartiesRuntime,
 	partiesAgentTools,
 } from '@flowdular/module-parties/server';
-import { createPgliteTestProvider } from '@flowdular/database-testing';
-import type { DatabaseProvider } from '@flowdular/database';
+import { createPgliteTestProvider } from '@flowdular/sdk/database-testing';
+import type { DatabaseProvider } from '@flowdular/sdk/database';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 const NO_USAGE = { inputTokens: 0, outputTokens: 0, totalTokens: 0 } as const;

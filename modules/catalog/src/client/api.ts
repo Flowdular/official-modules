@@ -1,5 +1,5 @@
-import { t } from '@flowdular/client/i18n';
-import type { HistoryPage } from '@flowdular/kernel';
+import { t } from '@flowdular/sdk/client/i18n';
+import type { HistoryPage } from '@flowdular/sdk/kernel';
 import type {
 	CatalogItem,
 	CreateCatalogItemInput,

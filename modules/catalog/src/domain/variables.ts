@@ -1,10 +1,13 @@
-import type { VariableSource } from '@flowdular/contracts';
-import type { AgentTool, AgentToolContext } from '@flowdular/harness/runtime';
+import type { VariableSource } from '@flowdular/sdk/contracts';
+import type {
+	AgentTool,
+	AgentToolContext,
+} from '@flowdular/sdk/harness/runtime';
 import {
 	VariableResolutionError,
 	type PlatformVariableRegistry,
 	type VariableSourceResolutionContext,
-} from '@flowdular/kernel';
+} from '@flowdular/sdk/kernel';
 import { CATALOG_PERMISSIONS } from '../acl/permissions.ts';
 import type { CatalogItem } from './types.ts';
 

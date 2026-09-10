@@ -1,5 +1,5 @@
-import { validateToolInput, validateToolOutput } from '@flowdular/harness';
-import type { AgentToolContext } from '@flowdular/harness/runtime';
+import { validateToolInput, validateToolOutput } from '@flowdular/sdk/harness';
+import type { AgentToolContext } from '@flowdular/sdk/harness/runtime';
 import { afterAll, afterEach, describe, expect, it } from 'vitest';
 import { partiesAgentTools } from '../src/agent/tools.ts';
 import type { Party } from '../src/domain/types.ts';
@@ -7,7 +7,10 @@ import {
 	createPartiesRuntime,
 	type PartiesRuntime,
 } from '../src/server/runtime.ts';
-import { agentActor, createPlatformVariableRegistry } from '@flowdular/kernel';
+import {
+	agentActor,
+	createPlatformVariableRegistry,
+} from '@flowdular/sdk/kernel';
 import { PARTY_PERMISSIONS } from '../src/acl/permissions.ts';
 import { registerPartyVariableSource } from '../src/domain/variables.ts';
 import {

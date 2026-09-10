@@ -1,4 +1,4 @@
-import { t } from '@flowdular/client/i18n';
+import { t } from '@flowdular/sdk/client/i18n';
 
 export function catalogNavigationLabel(): string {
 	return t('catalog.nav.label');

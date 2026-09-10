@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import { resolveTemplate, validateTemplate } from '@flowdular/contracts';
+import { resolveTemplate, validateTemplate } from '@flowdular/sdk/contracts';
 import {
 	normalizeActor,
 	type Actor,
 	type HistoryPage,
 	type HistoryRequest,
-} from '@flowdular/kernel';
+} from '@flowdular/sdk/kernel';
 import {
 	EXPENSE_CLAIM_CATEGORIES,
 	EXPENSE_CLAIM_STATUSES,

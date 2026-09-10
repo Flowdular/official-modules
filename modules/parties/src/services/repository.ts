@@ -1,4 +1,4 @@
-import type { Actor, HistoryPage, HistoryQuery } from '@flowdular/kernel';
+import type { Actor, HistoryPage, HistoryQuery } from '@flowdular/sdk/kernel';
 import type {
 	Party,
 	PatchPartyInput,

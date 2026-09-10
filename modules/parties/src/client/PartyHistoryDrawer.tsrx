@@ -1,6 +1,12 @@
-import type { HistoryEntry, HistoryValue } from '@flowdular/kernel';
-import { activeLocale, t } from '@flowdular/client';
-import { Alert, Drawer, TableCard, Tag, type TableColumn } from '@flowdular/ui';
+import type { HistoryEntry, HistoryValue } from '@flowdular/sdk/kernel';
+import { activeLocale, t } from '@flowdular/sdk/client';
+import {
+	Alert,
+	Drawer,
+	TableCard,
+	Tag,
+	type TableColumn,
+} from '@flowdular/sdk/ui';
 import type { Party } from '../domain/types.ts';
 
 export interface PartyHistoryDrawerProps {

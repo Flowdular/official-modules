@@ -3,8 +3,8 @@ import type {
 	Party,
 	UpdatePartyInput,
 } from '../domain/types.ts';
-import { t } from '@flowdular/client/i18n';
-import type { HistoryPage } from '@flowdular/kernel';
+import { t } from '@flowdular/sdk/client/i18n';
+import type { HistoryPage } from '@flowdular/sdk/kernel';
 
 interface ErrorEnvelope {
 	readonly error?: { readonly message?: string };

@@ -1,5 +1,8 @@
-import type { DatabaseSession, DatabaseProvider } from '@flowdular/database';
-import type { AgentToolContext } from '@flowdular/harness/runtime';
+import type {
+	DatabaseSession,
+	DatabaseProvider,
+} from '@flowdular/sdk/database';
+import type { AgentToolContext } from '@flowdular/sdk/harness/runtime';
 import { afterAll, afterEach, describe, expect, it } from 'vitest';
 import { catalogAgentTools } from '../src/agent/tools.ts';
 import type { CatalogItem } from '../src/domain/types.ts';

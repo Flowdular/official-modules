@@ -1,5 +1,5 @@
-import type { DatabaseHandle, DatabaseProvider } from '@flowdular/database';
-import { createTestDatabaseProvider } from '@flowdular/database-testing';
+import type { DatabaseHandle, DatabaseProvider } from '@flowdular/sdk/database';
+import { createTestDatabaseProvider } from '@flowdular/sdk/database-testing';
 import {
 	DatabasePartyRepository,
 	migratePartiesDatabase,

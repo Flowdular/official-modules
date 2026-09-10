@@ -1,5 +1,5 @@
-import type { DatabaseMigration } from '@flowdular/database';
-import { postgresTenantTableState } from '@flowdular/database';
+import type { DatabaseMigration } from '@flowdular/sdk/database';
+import { postgresTenantTableState } from '@flowdular/sdk/database';
 
 /* Every constant mirrors its migrations/<id>.up.sql file byte for byte;
    tests/migrations.test.ts fails on drift. */

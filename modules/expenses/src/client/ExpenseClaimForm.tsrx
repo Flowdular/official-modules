@@ -1,6 +1,6 @@
 import { useMemo } from 'octane';
-import { Alert, Button, FormField, VariableTextarea } from '@flowdular/ui';
-import { useTranslation } from '@flowdular/client';
+import { Alert, Button, FormField, VariableTextarea } from '@flowdular/sdk/ui';
+import { useTranslation } from '@flowdular/sdk/client';
 import { createStore, useValue } from 'segment-state';
 import { EXPENSE_NOTE_VARIABLES } from '../domain/variables.ts';
 

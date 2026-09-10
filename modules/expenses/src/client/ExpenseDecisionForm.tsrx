@@ -1,5 +1,5 @@
-import { Alert, Button, FormField } from '@flowdular/ui';
-import { t } from '@flowdular/client';
+import { Alert, Button, FormField } from '@flowdular/sdk/ui';
+import { t } from '@flowdular/sdk/client';
 import type { ExpenseClaimDecision, ExpensesClaim } from '../domain/types.ts';
 
 export interface ExpenseDecisionFormProps {

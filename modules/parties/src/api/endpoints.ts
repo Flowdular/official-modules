@@ -6,15 +6,15 @@ import {
 	problemResponse,
 	readJsonObject,
 	requiredString,
-} from '@flowdular/server';
-import { parseHistoryRequest } from '@flowdular/kernel';
-import type { AuthRuntime } from '@flowdular/module-auth/server';
+} from '@flowdular/sdk/server';
+import { parseHistoryRequest } from '@flowdular/sdk/kernel';
+import type { AuthRuntime } from '@flowdular/sdk/modules/auth/server';
 import {
 	actorFromContext,
 	endpointIdentityFromContext,
 	principalFromContext,
 	sessionMutationDenial,
-} from '@flowdular/module-auth/server';
+} from '@flowdular/sdk/modules/auth/server';
 import { PARTY_PERMISSIONS } from '../acl/permissions.ts';
 import type {
 	CreatePartyInput,

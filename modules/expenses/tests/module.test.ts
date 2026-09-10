@@ -1,6 +1,6 @@
-import type { AuthPrincipal } from '@flowdular/module-auth';
-import type { AuthRuntime } from '@flowdular/module-auth/server';
-import { AUTH_PRINCIPAL_STATE_KEY } from '@flowdular/module-auth/server';
+import type { AuthPrincipal } from '@flowdular/sdk/modules/auth';
+import type { AuthRuntime } from '@flowdular/sdk/modules/auth/server';
+import { AUTH_PRINCIPAL_STATE_KEY } from '@flowdular/sdk/modules/auth/server';
 import { afterAll, afterEach, describe, expect, it } from 'vitest';
 import { EXPENSES_PERMISSIONS } from '../src/acl/permissions.ts';
 import type { CreateExpensesClaimInput } from '../src/domain/types.ts';
@@ -98,7 +98,7 @@ function authRuntime(actor: AuthPrincipal): AuthRuntime {
 
 /* auth.core resolves the browser session in its middleware and publishes it in
    context state; sessionMutationDenial reads it from there. The key is not yet
-   exported from @flowdular/module-auth/server, so this double mirrors it. */
+   exported from @flowdular/sdk/modules/auth/server, so this double mirrors it. */
 const AUTH_SESSION_STATE_KEY = 'flowdular.auth.session';
 
 function context(request: Request, actor?: AuthPrincipal) {

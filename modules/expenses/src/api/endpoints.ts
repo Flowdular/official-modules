@@ -7,15 +7,15 @@ import {
 	readJsonObject,
 	requiredInteger,
 	requiredString,
-} from '@flowdular/server';
-import { parseHistoryRequest } from '@flowdular/kernel';
-import type { AuthRuntime } from '@flowdular/module-auth/server';
+} from '@flowdular/sdk/server';
+import { parseHistoryRequest } from '@flowdular/sdk/kernel';
+import type { AuthRuntime } from '@flowdular/sdk/modules/auth/server';
 import {
 	actorFromContext,
 	endpointIdentityFromContext,
 	principalFromContext,
 	sessionMutationDenial,
-} from '@flowdular/module-auth/server';
+} from '@flowdular/sdk/modules/auth/server';
 import { EXPENSES_PERMISSIONS } from '../acl/permissions.ts';
 import {
 	EXPENSE_CLAIM_CATEGORIES,

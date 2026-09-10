@@ -1,4 +1,7 @@
-import type { VariableDefinition, VariableSource } from '@flowdular/contracts';
+import type {
+	VariableDefinition,
+	VariableSource,
+} from '@flowdular/sdk/contracts';
 
 /* These values are entered in the same claim form. They have no external
    source and therefore no permission mask. The service resolves them only

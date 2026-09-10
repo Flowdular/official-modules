@@ -3,9 +3,9 @@ import {
 	AgentHarness,
 	type AgentExecutionRequest,
 	type AgentToolContext,
-} from '@flowdular/harness/runtime';
-import { validateToolInput, validateToolOutput } from '@flowdular/harness';
-import type { DatabaseProvider } from '@flowdular/database';
+} from '@flowdular/sdk/harness/runtime';
+import { validateToolInput, validateToolOutput } from '@flowdular/sdk/harness';
+import type { DatabaseProvider } from '@flowdular/sdk/database';
 import { partiesAgentTools } from '../src/agent/tools.ts';
 import {
 	createPartiesRuntime,
@@ -252,7 +252,7 @@ describe('customer update tool', () => {
 			id: 'test-provider',
 			execute: async (
 				ctx: Parameters<
-					import('@flowdular/harness/runtime').AgentProvider['execute']
+					import('@flowdular/sdk/harness/runtime').AgentProvider['execute']
 				>[0],
 			) => {
 				await ctx.invokeTool(id, { id: original.id, phone: '789' });

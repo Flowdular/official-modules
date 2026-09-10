@@ -2,7 +2,7 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { hashBytes, packModule } from '@flowdular/cli/distribution';
+import { hashBytes, packModule } from 'flowdular/distribution';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const local = process.argv.includes('--local');
 const indexOnly = process.argv.includes('--index-only');

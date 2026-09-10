@@ -4,7 +4,7 @@ export { CatalogDashboardWidget, CatalogView } from './CatalogView.tsrx';
 import type {
 	ModuleClientContext,
 	ModuleClientContribution,
-} from '@flowdular/client';
+} from '@flowdular/sdk/client';
 import { createCatalogClientContribution as canonicalContribution } from './contribution.tsrx';
 
 /* Canonical entry used by the generated platform composition. */

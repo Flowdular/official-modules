@@ -1,4 +1,7 @@
-import type { ModuleManifest, RegisteredModule } from '@flowdular/contracts';
+import type {
+	ModuleManifest,
+	RegisteredModule,
+} from '@flowdular/sdk/contracts';
 import manifest from '../module.json' with { type: 'json' };
 import { CATALOG_PERMISSIONS } from './acl/permissions.ts';
 
