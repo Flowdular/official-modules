@@ -53,7 +53,7 @@ Each release uses `reviews/<module-id>.json`. It contains:
 - findings, which must be empty before packaging;
 - successful `typecheck`, `test` and `validate` checks, with their actual commands and exit codes.
 
-Use `readModuleSource` and `sourceDigest` from `@flowdular/cli/distribution` to calculate the source hash. Follow the existing review files for the schema. Recalculate evidence after any source change; never copy a passing report onto different source.
+Use `readModuleSource` and `sourceDigest` from `flowdular/distribution` to calculate the source hash. Follow the existing review files for the schema. Recalculate evidence after any source change; never copy a passing report onto different source.
 
 Automated checks and self-review support maintainer review. They cannot establish that an arbitrary publisher or review report is trustworthy.
 
@@ -79,7 +79,7 @@ Commit `registry/index.json` separately. Its artifact URLs now reference the exa
 For a local installation test, use the generated catalog in a disposable Flowdular workspace:
 
 ```sh
-pnpm flowdular module install expenses.core@0.6.0 \
+pnpm flowdular module install expenses.core@0.6.1 \
   --registry /absolute/path/to/official-modules/registry/local-index.json
 ```
 
