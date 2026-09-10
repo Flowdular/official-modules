@@ -101,3 +101,35 @@ Official business modules are distributed through this source catalog. The separ
 - Confirm no local overrides, generated runtime state or unrelated changes entered the diff.
 
 Keep the PR description focused on the final behavior. Maintainers should be able to reproduce the evidence from the repository.
+
+## Application integration in pull requests
+
+CI runs three jobs on every pull request: `validate`, `postgres` and
+`application-integration`. The integration job starts after validation and builds
+one application containing every module in the PR checkout, including newly
+added modules. It uses the pinned npm generator and the local reviewed catalog,
+not the published registry index.
+
+Run it with Node.js 24 and PostgreSQL tools (`initdb`, `pg_ctl`, `psql`) plus OpenSSL on PATH:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm test:application
+```
+
+The check creates an isolated application, installs each exact module version
+through the CLI, enables the dependency closure through the CLI composition API,
+and checks the installation lock. It requires every module to declare typecheck
+and test scripts, runs the combined application's typecheck and tests, builds the
+client and server, and starts the built server. The HTTP smoke requires login HTML
+and a working JavaScript asset. It does not sign in or replace module-specific
+permission and tenancy tests.
+
+The build and built server use `NODE_ENV=production` against a dedicated loopback PostgreSQL cluster with verified TLS and restricted runtime roles. The wrapper creates and removes this cluster; it never resets an existing database. Test state and generated keys are disposable. No deployment database or publishing
+credentials are passed to the application. The generated application updates its
+own lockfile as modules are added; the registry's committed lockfile remains
+frozen. Server shutdown and temporary-directory cleanup run on success and failure.
+
+Maintainers should require all three CI statuses and a human review before merge
+when branch protection is configured. Registry publication remains a separate
+maintainer action after merge.

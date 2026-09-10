@@ -43,3 +43,10 @@ apply it, enable the module through the CLI, then typecheck/test/build the consu
 Exercise changed screens in the rendered application with synthetic data. Verify
 SDK client imports do not pull server/database code into the browser. Record the
 commands, exit codes and relevant results for the separate final review phase.
+
+The repository provides `pnpm test:application` on Node.js 24 for the combined
+consumer check. It packs current reviewed source, scaffolds with the pinned npm
+generator, installs and enables every current module, then runs typecheck, tests,
+client/server build and an anonymous HTTP smoke. Run it before delivery when
+module source or integration changes. Passing this smoke does not replace the
+module's permission, tenancy or authenticated UI tests.

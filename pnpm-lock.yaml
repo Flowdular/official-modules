@@ -11,6 +11,9 @@ importers:
       '@tsrx/prettier-plugin':
         specifier: 0.3.120
         version: 0.3.120(prettier@3.6.2)
+      create-flowdular:
+        specifier: 0.1.0
+        version: 0.1.0
       flowdular:
         specifier: 0.1.0
         version: 0.1.0(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3)
@@ -1261,6 +1264,11 @@ packages:
   cors@2.8.6:
     resolution: {integrity: sha512-tJtZBBHA6vjIAaF6EnIaq6laBBP9aq/Y3ouVJjEfoHbRBcHBAHYcMh/w8LDrk2PvIMMq8gmopa5D4V8RmbrxGw==}
     engines: {node: '>= 0.10'}
+
+  create-flowdular@0.1.0:
+    resolution: {integrity: sha512-bfVzulbEkLwHyCoi1liWaCfpd4weX4oe/VQY72TeeKxhIg0B+AM3s8KKLU/Tt0Sju+b1tvEV0xtGENLa+aOCQA==}
+    engines: {node: '>=22.22.2'}
+    hasBin: true
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -3499,6 +3507,8 @@ snapshots:
     dependencies:
       object-assign: 4.1.1
       vary: 1.1.2
+
+  create-flowdular@0.1.0: {}
 
   cross-spawn@7.0.6:
     dependencies:

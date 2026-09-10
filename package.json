@@ -11,12 +11,14 @@
 		"verify": "pnpm rules:check && pnpm typecheck && pnpm test && pnpm validate",
 		"release:pack": "node scripts/build-release.mjs",
 		"rules:generate": "rulesync generate",
-		"rules:check": "rulesync generate --check"
+		"rules:check": "rulesync generate --check",
+		"test:application": "bash scripts/with-application-postgres.sh"
 	},
 	"devDependencies": {
 		"prettier": "3.6.2",
 		"@tsrx/prettier-plugin": "0.3.120",
 		"flowdular": "0.1.0",
-		"rulesync": "16.21.0"
+		"rulesync": "16.21.0",
+		"create-flowdular": "0.1.0"
 	}
 }

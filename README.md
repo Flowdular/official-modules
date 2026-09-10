@@ -100,7 +100,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for specifications, tests, review eviden
 
 Dependencies resolve from npm through the committed `pnpm-lock.yaml`. CI installs with `pnpm install --frozen-lockfile` in both jobs. Keep temporary local tarball overrides out of commits.
 
-CI runs module validation and tests, plus a PostgreSQL job with restricted runtime roles. See the [initial transfer review](docs/reviews/initial-transfer.md) for the extraction evidence.
+CI runs module validation and tests, PostgreSQL tests with restricted runtime roles, and a fresh application integration job. The application job installs every module from the PR, typechecks and tests the combined app, builds its client and server, then checks the running server over HTTP. See the [initial transfer review](docs/reviews/initial-transfer.md) for the extraction evidence.
 
 ## License
 
