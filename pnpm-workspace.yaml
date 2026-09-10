@@ -1,5 +1,6 @@
 packages:
   - modules/*
+  - tests/*
   - platform
 
 allowBuilds:

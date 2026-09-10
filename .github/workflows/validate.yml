@@ -17,7 +17,7 @@ jobs:
         with:
           runtime: node@24
           cache: true
-          require-lockfile: true
+          require-lockfile: false
       - run: pnpm verify
       - run: pnpm release:pack --local
       - uses: actions/upload-artifact@v4
@@ -25,3 +25,47 @@ jobs:
           name: reviewed-modules
           path: registry/releases
           if-no-files-found: error
+
+  postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/setup@v2
+        with:
+          runtime: node@24
+          cache: true
+          require-lockfile: false
+      # The runtime role must hold neither SUPERUSER nor BYPASSRLS, or the
+      # adapter suites would pass against a database that never enforces RLS.
+      - name: Create the migrator, runtime and background roles
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -euo pipefail
+          run() { psql -h 127.0.0.1 -U postgres -v ON_ERROR_STOP=1 "$@"; }
+          run -c "CREATE ROLE coreloom_migrator LOGIN PASSWORD 'migrator' NOSUPERUSER NOBYPASSRLS"
+          run -c "CREATE ROLE coreloom_runtime LOGIN PASSWORD 'runtime' NOSUPERUSER NOBYPASSRLS"
+          run -c "CREATE ROLE coreloom_background LOGIN PASSWORD 'background' NOSUPERUSER NOBYPASSRLS"
+          run -c "CREATE DATABASE coreloom_test OWNER coreloom_migrator"
+          run -d coreloom_test -c "GRANT CONNECT ON DATABASE coreloom_test TO coreloom_runtime, coreloom_background"
+          run -d coreloom_test -c "REVOKE ALL ON SCHEMA public FROM PUBLIC"
+      - name: Adapter matrix
+        env:
+          FD_TEST_DATABASE_ADAPTER: postgresql
+          FD_TEST_POSTGRES_URL: postgres://coreloom_migrator:migrator@127.0.0.1:5432/coreloom_test
+          FD_TEST_POSTGRES_RUNTIME_URL: postgres://coreloom_runtime:runtime@127.0.0.1:5432/coreloom_test
+          FD_TEST_POSTGRES_BACKGROUND_URL: postgres://coreloom_background:background@127.0.0.1:5432/coreloom_test
+        run: pnpm test

@@ -1,0 +1,24 @@
+{
+	"name": "@official/consumer-tests",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"typecheck": "tsrx-tsc --noEmit -p tsconfig.json",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@flowdular/database": "0.1.0",
+		"@flowdular/database-testing": "0.1.0",
+		"@flowdular/kernel": "0.1.0",
+		"@flowdular/harness": "0.1.0",
+		"@flowdular/module-catalog": "workspace:*",
+		"@flowdular/module-parties": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/node": "24.13.3",
+		"@tsrx/typescript-plugin": "0.3.120",
+		"typescript": "5.9.3",
+		"vitest": "4.1.10"
+	}
+}
