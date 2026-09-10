@@ -1,3 +1,10 @@
+---
+root: true
+targets: ['*']
+globs: ['**/*']
+description: Official Flowdular module contribution contract
+---
+
 <!-- Generated from .ai/rules/official-modules.md by pnpm rules:generate. -->
 
 # Official module work

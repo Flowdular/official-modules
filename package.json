@@ -8,12 +8,15 @@
 		"typecheck": "pnpm -r --if-present typecheck",
 		"test": "pnpm -r --if-present test",
 		"validate": "flowdular module validate",
-		"verify": "pnpm typecheck && pnpm test && pnpm validate",
-		"release:pack": "node scripts/build-release.mjs"
+		"verify": "pnpm rules:check && pnpm typecheck && pnpm test && pnpm validate",
+		"release:pack": "node scripts/build-release.mjs",
+		"rules:generate": "rulesync generate",
+		"rules:check": "rulesync generate --check"
 	},
 	"devDependencies": {
 		"prettier": "3.6.2",
 		"@tsrx/prettier-plugin": "0.3.120",
-		"flowdular": "0.1.0"
+		"flowdular": "0.1.0",
+		"rulesync": "16.21.0"
 	}
 }

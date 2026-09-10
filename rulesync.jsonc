@@ -1,0 +1,7 @@
+{
+	"inputRoots": [".ai"],
+	"outputRoots": ["."],
+	"targets": ["codexcli", "claudecode"],
+	"features": ["rules", "skills"],
+	"delete": true,
+}

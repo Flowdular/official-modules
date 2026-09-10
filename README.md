@@ -107,3 +107,7 @@ CI runs module validation and tests, plus a PostgreSQL job with restricted runti
 [MIT](LICENSE). Module source remains available in the installed workspace.
 
 The npm surface is three packages: `@flowdular/sdk`, `flowdular` and `create-flowdular`. Modules here depend on the SDK; UI comes from `@flowdular/sdk/ui`. Module releases before the shared SDK transition remain in history; use the current versions listed above.
+
+## Agent-assisted contributions
+
+The [contributor skills](.ai/skills/README.md) cover specification, implementation, tests, review and pull requests. RuleSync keeps Codex and Claude Code instructions synchronized; see [CONTRIBUTING.md](CONTRIBUTING.md).
