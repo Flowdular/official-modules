@@ -1,0 +1,27 @@
+name: Module validation
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/setup@v2
+        with:
+          runtime: node@24
+          cache: true
+          require-lockfile: true
+      - run: pnpm verify
+      - run: pnpm release:pack --local
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-modules
+          path: registry/releases
+          if-no-files-found: error

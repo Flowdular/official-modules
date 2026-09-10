@@ -1,0 +1,1 @@
+ALTER TABLE parties DROP COLUMN IF EXISTS vat_id;

@@ -1,0 +1,9 @@
+{
+	"schemaVersion": 1,
+	"architectureVersion": "0.2.0",
+	"modules": {
+		"roots": ["modules"],
+		"enabled": []
+	},
+	"locales": ["en", "pl"]
+}

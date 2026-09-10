@@ -1,0 +1,19 @@
+{
+	"name": "flowdular-official-modules",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"packageManager": "pnpm@11.17.0",
+	"scripts": {
+		"typecheck": "pnpm -r --if-present typecheck",
+		"test": "pnpm -r --if-present test",
+		"validate": "flowdular module validate",
+		"verify": "pnpm typecheck && pnpm test && pnpm validate",
+		"release:pack": "node scripts/build-release.mjs"
+	},
+	"devDependencies": {
+		"@flowdular/cli": "0.1.0",
+		"prettier": "3.6.2",
+		"@tsrx/prettier-plugin": "0.3.120"
+	}
+}
