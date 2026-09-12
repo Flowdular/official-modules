@@ -8,6 +8,6 @@ allowBuilds:
   tldjs: false
 
 minimumReleaseAgeExclude:
-  - '@flowdular/sdk@0.1.0'
-  - flowdular@0.1.0
-  - create-flowdular@0.1.0
+  - '@flowdular/sdk@0.2.4'
+  - flowdular@0.2.4
+  - create-flowdular@0.2.6

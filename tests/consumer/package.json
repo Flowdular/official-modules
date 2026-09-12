@@ -10,7 +10,7 @@
 	"dependencies": {
 		"@flowdular/module-catalog": "workspace:*",
 		"@flowdular/module-parties": "workspace:*",
-		"@flowdular/sdk": "0.1.0"
+		"@flowdular/sdk": "0.2.4"
 	},
 	"devDependencies": {
 		"@types/node": "24.13.3",

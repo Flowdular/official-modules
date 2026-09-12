@@ -1,6 +1,6 @@
 schemaVersion: 1
 id: catalog.core
-specVersion: 0.6.1
+specVersion: 0.7.0
 status: approved
 name: Product Catalog Core
 description: Provides tenant-scoped products and services with stable SKUs, units, prices, currencies, and lifecycle state.
@@ -12,9 +12,9 @@ capabilities:
   - translations
 dependencies:
   - id: system.core
-    range: 0.5.0
+    range: ^0.7.0
   - id: auth.core
-    range: 0.10.0
+    range: ^0.13.0
 tenancy: required
 locales:
   - en
@@ -38,6 +38,7 @@ permissions:
 dataOwnership:
   - catalog.core owns SKU, item identity, kind, unit, base price, currency, and lifecycle status.
   - catalog.core owns the idempotency ledger for its mutating agent tools and workflow actions; callers supply the key but do not maintain a second target ledger.
+  - catalog.core declares the data classes catalog.core.items (catalog_items), catalog.core.history (catalog_items_history_v2, which holds every row of the superseded catalog_items_history) and catalog.core.idempotency-ledger (catalog_idempotency_ledger); items and history are exported per workspace, the ledger is excluded with a stated reason.
   - Sales and purchasing modules reference catalog item identifiers and snapshot commercial terms when required by their specs.
 acceptanceScenarios:
   - id: CATALOG-LIST
