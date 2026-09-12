@@ -3,6 +3,8 @@ import { resolveTemplate, validateTemplate } from '@flowdular/sdk/contracts';
 import {
 	normalizeActor,
 	type Actor,
+	type DataClassExportSink,
+	type DataClassExportSummary,
 	type HistoryPage,
 	type HistoryRequest,
 } from '@flowdular/sdk/kernel';
@@ -17,7 +19,10 @@ import {
 	type UpdateExpensesClaimInput,
 } from '../domain/types.ts';
 import { EXPENSE_NOTE_VARIABLES } from '../domain/variables.ts';
-import type { ExpensesRepository } from './repository.ts';
+import type { ExpensesExportCursor, ExpensesRepository } from './repository.ts';
+
+/** Rows one export query holds, so a long history costs bounded memory. */
+export const EXPORT_PAGE = 500;
 
 export class ExpensesServiceError extends Error {
 	constructor(
@@ -137,6 +142,34 @@ function draftInput(
 			'expense.date': normalized.expenseDate,
 		}),
 	};
+}
+
+/* Pages are ordered by record time then id, so the first row is the oldest
+   and the last row of each page is the next cursor. */
+async function exportPaged<T extends { readonly id: string }>(
+	page: (after: ExpensesExportCursor | null) => Promise<readonly T[]>,
+	pageSize: number,
+	sink: DataClassExportSink,
+	at: (item: T) => number,
+	row: (item: T) => Record<string, unknown>,
+): Promise<DataClassExportSummary> {
+	let cursor: ExpensesExportCursor | null = null;
+	let rows = 0;
+	let from: Date | null = null;
+	let to: Date | null = null;
+	for (;;) {
+		const items = await page(cursor);
+		for (const item of items) {
+			await sink.write(row(item));
+			rows += 1;
+			from ??= new Date(at(item));
+			to = new Date(at(item));
+		}
+		if (items.length < pageSize) break;
+		const last = items[items.length - 1]!;
+		cursor = { at: at(last), id: last.id };
+	}
+	return { rows, from, to };
 }
 
 function trustedActor(actor: Actor): Actor {
@@ -312,6 +345,60 @@ export class ExpensesService {
 	async countAwaitingApproval(tenantId: string): Promise<number> {
 		return await this.repository.countAwaitingApproval(
 			identifier(tenantId, 'tenantId'),
+		);
+	}
+
+	async exportClaims(
+		tenantId: string,
+		sink: DataClassExportSink,
+		pageSize = EXPORT_PAGE,
+	): Promise<DataClassExportSummary> {
+		const owner = identifier(tenantId, 'tenantId');
+		return await exportPaged(
+			(after) => this.repository.listForExport(owner, after, pageSize),
+			pageSize,
+			sink,
+			(claim) => claim.createdAt,
+			(claim) => ({
+				id: claim.id,
+				claimantId: claim.claimantId,
+				title: claim.title,
+				amountMinor: claim.amountMinor,
+				currency: claim.currency,
+				category: claim.category,
+				expenseDate: claim.expenseDate,
+				note: claim.note,
+				noteTemplate: claim.noteTemplate,
+				status: claim.status,
+				decisionComment: claim.decisionComment,
+				createdAt: new Date(claim.createdAt).toISOString(),
+			}),
+		);
+	}
+
+	async exportHistory(
+		tenantId: string,
+		sink: DataClassExportSink,
+		pageSize = EXPORT_PAGE,
+	): Promise<DataClassExportSummary> {
+		const owner = identifier(tenantId, 'tenantId');
+		return await exportPaged(
+			(after) => this.repository.listHistoryForExport(owner, after, pageSize),
+			pageSize,
+			sink,
+			(entry) => entry.occurredAt,
+			(entry) => ({
+				id: entry.id,
+				recordId: entry.recordId,
+				version: entry.version,
+				action: entry.action,
+				actorKind: entry.actorKind,
+				actorId: entry.actorId,
+				actorLabel: entry.actorLabel,
+				runId: entry.runId,
+				changes: entry.changes,
+				occurredAt: new Date(entry.occurredAt).toISOString(),
+			}),
 		);
 	}
 

@@ -2,6 +2,8 @@ import { randomUUID } from 'node:crypto';
 import {
 	normalizeActor,
 	type Actor,
+	type DataClassExportSink,
+	type DataClassExportSummary,
 	type HistoryPage,
 	type HistoryRequest,
 } from '@flowdular/sdk/kernel';
@@ -12,7 +14,7 @@ import type {
 	PatchPartyInput,
 	UpdatePartyInput,
 } from '../domain/types.ts';
-import type { PartyRepository } from './repository.ts';
+import type { ExportCursor, PartyRepository } from './repository.ts';
 import {
 	canonicalDigest,
 	TargetIdempotencyConflictError,
@@ -21,6 +23,35 @@ import {
 export interface PartyIdempotencyRequest {
 	readonly key: string;
 	readonly operationId: string;
+}
+
+/** Rows one export read fetches; every class pages at this size. */
+export const PARTY_EXPORT_PAGE = 200;
+
+/** Walks every row of one tenant in (time, id) order and writes each to the sink. */
+async function exportPaged<T extends { readonly id: string }>(
+	read: (after: ExportCursor | null) => Promise<readonly T[]>,
+	at: (record: T) => number,
+	sink: DataClassExportSink,
+	toRow: (record: T) => Record<string, unknown>,
+): Promise<DataClassExportSummary> {
+	let cursor: ExportCursor | null = null;
+	let rows = 0;
+	let from: Date | null = null;
+	let to: Date | null = null;
+	for (;;) {
+		const page = await read(cursor);
+		for (const record of page) {
+			await sink.write(toRow(record));
+			rows += 1;
+			from ??= new Date(at(record));
+			to = new Date(at(record));
+		}
+		if (page.length < PARTY_EXPORT_PAGE) break;
+		const last = page[page.length - 1]!;
+		cursor = { at: at(last), id: last.id };
+	}
+	return { rows, from, to };
 }
 
 export class PartyServiceError extends Error {
@@ -303,6 +334,55 @@ export class PartiesService {
 			limit: request.limit,
 			cursor: request.cursor,
 		});
+	}
+
+	exportParties(
+		tenantId: string,
+		sink: DataClassExportSink,
+	): Promise<DataClassExportSummary> {
+		const tenant = bounded(tenantId, 'tenantId', 1, 128);
+		return exportPaged(
+			(after) =>
+				this.repository.listForExport(tenant, after, PARTY_EXPORT_PAGE),
+			(party) => party.createdAt,
+			sink,
+			(party) => ({
+				id: party.id,
+				name: party.name,
+				kind: party.kind,
+				email: party.email,
+				phone: party.phone,
+				vatId: party.vatId,
+				status: party.status,
+				createdAt: new Date(party.createdAt).toISOString(),
+			}),
+		);
+	}
+
+	exportHistory(
+		tenantId: string,
+		sink: DataClassExportSink,
+	): Promise<DataClassExportSummary> {
+		const tenant = bounded(tenantId, 'tenantId', 1, 128);
+		return exportPaged(
+			(after) =>
+				this.repository.listHistoryForExport(tenant, after, PARTY_EXPORT_PAGE),
+			(entry) => entry.occurredAt,
+			sink,
+			(entry) => ({
+				id: entry.id,
+				recordId: entry.recordId,
+				version: entry.version,
+				action: entry.action,
+				actorKind: entry.actorKind,
+				actorId: entry.actorId,
+				actorLabel: entry.actorLabel,
+				runId: entry.runId,
+				configuredBy: entry.configuredByJson,
+				changes: entry.changesJson,
+				occurredAt: new Date(entry.occurredAt).toISOString(),
+			}),
+		);
 	}
 
 	private async changeStatus(

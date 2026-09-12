@@ -1,6 +1,6 @@
 schemaVersion: 1
 id: parties.core
-specVersion: 0.8.1
+specVersion: 0.9.0
 status: approved
 name: Business Parties Core
 description: Provides the tenant-scoped customer and supplier master data used by commercial ERP modules.
@@ -12,9 +12,9 @@ capabilities:
   - translations
 dependencies:
   - id: system.core
-    range: 0.5.0
+    range: ^0.7.0
   - id: auth.core
-    range: 0.10.0
+    range: ^0.13.0
 tenancy: required
 locales:
   - en
@@ -31,6 +31,7 @@ invariants:
   - One tenant-scoped durable target ledger is shared by mutating agent tools and workflow actions; each entry binds an idempotency key to the exact tool identifier or versioned workflow action identifier, canonical input digest, and first persisted result in the same transaction as the party mutation.
   - Replaying the same idempotency key for the same operation and canonical input returns the original result without another party or history row, while reuse for another operation or input fails with a stable conflict.
   - Idempotency ledger entries remain after a party is deleted, and audit metadata records identifiers, input digests, and outcomes without raw tool input, credentials, secrets, or result payloads.
+  - The data class export of one tenant reads every row of that tenant and no other through the module's own tenant-scoped transaction. No data class carries a retention period, a sweep, or an erasure, because parties and their history leave only when a person deletes the party, and the idempotency ledger stays durable and is excluded from the export with a stated reason.
 permissions:
   - id: parties.records.read
     description: Read customers and suppliers in the active tenant.
@@ -40,6 +41,7 @@ dataOwnership:
   - parties.core owns party identity, kind, contact summary, and lifecycle status.
   - parties.core owns the idempotency ledger for its mutating agent tools and workflow actions; callers supply the key but do not maintain a second target ledger.
   - Commercial modules reference party identifiers and do not duplicate party master data.
+  - parties.core declares three platform data classes, parties.core.parties (the parties table), parties.core.history (parties_history_v2 and the superseded parties_history it absorbed), and parties.core.idempotency-ledger (parties_idempotency_ledger). Parties and history are exportable and each export pages through every row of one tenant; the ledger is not exportable because it is operational replay evidence whose parties are exported by parties.core.parties.
 acceptanceScenarios:
   - id: PARTIES-LIST
     given: Tenant-scoped customer and supplier records exist.

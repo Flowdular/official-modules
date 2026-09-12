@@ -1,6 +1,6 @@
 schemaVersion: 1
 id: expenses.core
-specVersion: 0.6.1
+specVersion: 0.7.0
 status: approved
 name: Expense Claims
 description: Provides tenant-scoped expense claims with employee ownership, submission, manager decisions, status filtering, and approval reporting.
@@ -12,9 +12,9 @@ capabilities:
   - translations
 dependencies:
   - id: system.core
-    range: 0.5.0
+    range: ^0.7.0
   - id: auth.core
-    range: 0.10.0
+    range: ^0.13.0
 tenancy: required
 locales:
   - en
@@ -32,6 +32,7 @@ invariants:
   - A principal without approval permission can read only their own claims, while a principal with approval permission can read submitted claims awaiting a decision in the active tenant.
   - User-facing copy resolves from the active locale with English as the fallback and never renders a missing translation as empty content.
   - An expense note may reference only the linked fields in the same claim form; its raw template and one-pass resolved note are both retained without recursive resolution.
+  - The data class export writes every claim and every history revision of exactly one tenant, read in bounded pages inside the module's own tenant-scoped transaction. Neither class is swept or erased, because claims and their revision trail are accounting records that leave only when a person deletes a draft, and erasure is not a subject right over them.
 permissions:
   - id: expenses.claims.read
     description: Read expense claims visible to the principal in the active tenant.
@@ -42,6 +43,7 @@ permissions:
 dataOwnership:
   - expenses.core owns claim identity, claimant identity, title, amount in minor units, currency, category, expense date, optional note, status, and decision comment.
   - Authentication supplies the trusted tenant and principal identities used for claim ownership and authorization.
+  - expenses.core declares the data classes expenses.core.claims (the expenses_claims table) and expenses.core.claims-history (the expenses_claims_history table); both are exportable with no retention period, and the export writes every row of the requesting tenant through the module service.
 acceptanceScenarios:
   - id: EXPENSES-LIST
     given: Expense claims in different statuses exist for more than one claimant in the active tenant.
