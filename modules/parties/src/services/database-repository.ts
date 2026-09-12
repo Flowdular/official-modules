@@ -21,7 +21,11 @@ import type {
 	UpdatePartyInput,
 } from '../domain/types.ts';
 import { databaseMigrations } from './migration.ts';
-import type { PartyRepository } from './repository.ts';
+import type {
+	ExportCursor,
+	PartyHistoryExportRow,
+	PartyRepository,
+} from './repository.ts';
 import {
 	canonicalDigest,
 	TargetIdempotencyCorruptionError,
@@ -55,6 +59,22 @@ const SET_STATUS = `UPDATE parties SET status = $1 WHERE tenant_id = $2 AND id =
 
 const DELETE = 'DELETE FROM parties WHERE tenant_id = $1 AND id = $2';
 
+/* Export pages walk (time, id) so a page boundary never repeats or skips a
+   row while the workspace keeps writing. */
+const LIST_FOR_EXPORT = `SELECT ${COLUMNS} FROM parties
+		 WHERE tenant_id = $1
+		   AND ($2::bigint IS NULL OR (created_at, id) > ($2::bigint, $3::text))
+		 ORDER BY created_at, id
+		 LIMIT $4`;
+
+const LIST_HISTORY_FOR_EXPORT = `SELECT id, record_id, version, action, actor_kind,
+		   actor_id, actor_label, run_id, configured_by_json, changes_json, occurred_at
+		 FROM ${HISTORY_TABLE}
+		 WHERE tenant_id = $1
+		   AND ($2::bigint IS NULL OR (occurred_at, id) > ($2::bigint, $3::text))
+		 ORDER BY occurred_at, id
+		 LIMIT $4`;
+
 const FIND_IDEMPOTENCY = `SELECT operation_id, input_digest, result_json, result_digest
 		 FROM parties_idempotency_ledger
 		 WHERE tenant_id = $1 AND idempotency_key = $2`;
@@ -81,6 +101,20 @@ interface IdempotencyRow {
 	input_digest: string;
 	result_json: string;
 	result_digest: string;
+}
+
+interface HistoryExportRow {
+	id: string;
+	record_id: string;
+	version: number | bigint | string;
+	action: string;
+	actor_kind: string;
+	actor_id: string;
+	actor_label: string;
+	run_id: string | null;
+	configured_by_json: string | null;
+	changes_json: string;
+	occurred_at: number | bigint | string;
 }
 
 /* PostgreSQL returns BIGINT as a string, so every numeric read is normalized
@@ -384,6 +418,52 @@ export class DatabasePartyRepository implements PartyRepository {
 			(transaction) => queryRecordHistory(transaction, HISTORY_TABLE, query),
 			{ access: 'read', tenantId: query.tenantId },
 		);
+	}
+
+	async listForExport(
+		tenantId: string,
+		after: ExportCursor | null,
+		limit: number,
+	): Promise<readonly Party[]> {
+		await this.readyPromise;
+		const result = await this.database.transaction(
+			(transaction) =>
+				transaction.query<PartyRow>({
+					text: LIST_FOR_EXPORT,
+					parameters: [tenantId, after?.at ?? null, after?.id ?? null, limit],
+				}),
+			{ access: 'read', tenantId },
+		);
+		return result.rows.map(fromRow);
+	}
+
+	async listHistoryForExport(
+		tenantId: string,
+		after: ExportCursor | null,
+		limit: number,
+	): Promise<readonly PartyHistoryExportRow[]> {
+		await this.readyPromise;
+		const result = await this.database.transaction(
+			(transaction) =>
+				transaction.query<HistoryExportRow>({
+					text: LIST_HISTORY_FOR_EXPORT,
+					parameters: [tenantId, after?.at ?? null, after?.id ?? null, limit],
+				}),
+			{ access: 'read', tenantId },
+		);
+		return result.rows.map((row) => ({
+			id: row.id,
+			recordId: row.record_id,
+			version: integer(row.version),
+			action: row.action,
+			actorKind: row.actor_kind,
+			actorId: row.actor_id,
+			actorLabel: row.actor_label,
+			runId: row.run_id,
+			configuredByJson: row.configured_by_json,
+			changesJson: row.changes_json,
+			occurredAt: integer(row.occurred_at),
+		}));
 	}
 
 	async #find(
