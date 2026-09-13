@@ -3,6 +3,6 @@
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
-		"@flowdular/sdk": "0.1.0"
+		"@flowdular/sdk": "0.2.4"
 	}
 }

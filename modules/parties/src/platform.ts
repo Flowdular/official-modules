@@ -4,6 +4,7 @@ import type {
 } from '@flowdular/sdk/modules/auth/server';
 import { platformVariableRegistry } from '@flowdular/sdk/kernel';
 import { registerPartyVariableSource } from './domain/variables.ts';
+import { partiesDataClasses } from './services/data-classes.ts';
 import {
 	createPartiesRuntime,
 	createPartyRoutes,
@@ -22,6 +23,7 @@ export function createServerComposition(
 					? 'runtime'
 					: 'preview',
 	});
+	context.dataClasses.declare(partiesDataClasses(() => runtime.service()));
 	const tools = partiesAgentTools(runtime);
 	context.agentTools.register(tools);
 	registerPartyVariableSource(

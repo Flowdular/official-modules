@@ -12,6 +12,7 @@ import {
 	type Actor,
 	type HistoryPage,
 	type HistoryQuery,
+	type RecordChanges,
 	type TrackedFields,
 } from '@flowdular/sdk/kernel';
 import type {
@@ -20,7 +21,9 @@ import type {
 } from '../domain/types.ts';
 import { databaseMigrations } from './migration.ts';
 import type {
+	ExpenseClaimHistoryExport,
 	ExpenseClaimListQuery,
+	ExpensesExportCursor,
 	ExpensesRepository,
 } from './repository.ts';
 
@@ -40,6 +43,19 @@ interface ExpensesClaimRow {
 	status: ExpensesClaim['status'];
 	decision_comment: string | null;
 	created_at: number | bigint | string;
+}
+
+interface ExpensesHistoryRow {
+	id: string;
+	record_id: string;
+	version: number | bigint | string;
+	action: string;
+	actor_kind: string;
+	actor_id: string;
+	actor_label: string;
+	run_id: string | null;
+	changes_json: string;
+	occurred_at: number | bigint | string;
 }
 
 /* PostgreSQL returns BIGINT as a string. Every integer read crosses this
@@ -121,6 +137,35 @@ const DELETE = 'DELETE FROM expenses_claims WHERE tenant_id = $1 AND id = $2';
 
 const COUNT_AWAITING_APPROVAL = `SELECT COUNT(*) AS count FROM expenses_claims
 	 WHERE tenant_id = $1 AND status = 'submitted'`;
+
+const LIST_FOR_EXPORT = `SELECT ${CLAIM_COLUMNS} FROM expenses_claims
+	 WHERE tenant_id = $1
+	   AND ($2::bigint IS NULL OR (created_at, id) > ($2::bigint, $3::text))
+	 ORDER BY created_at, id
+	 LIMIT $4`;
+
+const LIST_HISTORY_FOR_EXPORT = `SELECT id, record_id, version, action, actor_kind,
+	 actor_id, actor_label, run_id, changes_json, occurred_at
+	 FROM expenses_claims_history
+	 WHERE tenant_id = $1
+	   AND ($2::bigint IS NULL OR (occurred_at, id) > ($2::bigint, $3::text))
+	 ORDER BY occurred_at, id
+	 LIMIT $4`;
+
+function historyFromRow(row: ExpensesHistoryRow): ExpenseClaimHistoryExport {
+	return {
+		id: row.id,
+		recordId: row.record_id,
+		version: integer(row.version, 'version'),
+		action: row.action,
+		actorKind: row.actor_kind,
+		actorId: row.actor_id,
+		actorLabel: row.actor_label,
+		runId: row.run_id,
+		changes: JSON.parse(row.changes_json) as RecordChanges,
+		occurredAt: integer(row.occurred_at, 'timestamp'),
+	};
+}
 
 export async function migrateExpensesDatabase(
 	database: DatabaseHandle,
@@ -312,6 +357,40 @@ export class DatabaseExpensesRepository implements ExpensesRepository {
 			{ access: 'read', tenantId },
 		);
 		return integer(result.rows[0]?.count ?? 0, 'count');
+	}
+
+	async listForExport(
+		tenantId: string,
+		after: ExpensesExportCursor | null,
+		limit: number,
+	): Promise<readonly ExpensesClaim[]> {
+		await this.readyPromise;
+		const result = await this.database.transaction(
+			(transaction) =>
+				transaction.query<ExpensesClaimRow>({
+					text: LIST_FOR_EXPORT,
+					parameters: [tenantId, after?.at ?? null, after?.id ?? null, limit],
+				}),
+			{ access: 'read', tenantId },
+		);
+		return result.rows.map(fromRow);
+	}
+
+	async listHistoryForExport(
+		tenantId: string,
+		after: ExpensesExportCursor | null,
+		limit: number,
+	): Promise<readonly ExpenseClaimHistoryExport[]> {
+		await this.readyPromise;
+		const result = await this.database.transaction(
+			(transaction) =>
+				transaction.query<ExpensesHistoryRow>({
+					text: LIST_HISTORY_FOR_EXPORT,
+					parameters: [tenantId, after?.at ?? null, after?.id ?? null, limit],
+				}),
+			{ access: 'read', tenantId },
+		);
+		return result.rows.map(historyFromRow);
 	}
 
 	async #findIn(
