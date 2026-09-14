@@ -12,11 +12,11 @@ importers:
         specifier: 0.3.120
         version: 0.3.120(prettier@3.6.2)
       create-flowdular:
-        specifier: 0.1.0
-        version: 0.1.0
+        specifier: 0.3.1
+        version: 0.3.1
       flowdular:
-        specifier: 0.1.0
-        version: 0.1.0(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3)
+        specifier: 0.3.1
+        version: 0.3.1(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3)
       prettier:
         specifier: 3.6.2
         version: 3.6.2
@@ -27,14 +27,14 @@ importers:
   modules/catalog:
     dependencies:
       '@flowdular/sdk':
-        specifier: 0.1.0
-        version: 0.1.0(@types/node@24.13.3)(esbuild@0.28.2)(typescript@5.9.3)(zod@4.5.4)
+        specifier: 0.3.1
+        version: 0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
       octane:
         specifier: 0.1.51
-        version: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+        version: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
       segment-state:
         specifier: 0.2.0
-        version: 0.2.0(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
+        version: 0.2.0(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0)))
     devDependencies:
       '@tsrx/typescript-plugin':
         specifier: 0.3.120
@@ -52,14 +52,14 @@ importers:
   modules/expenses:
     dependencies:
       '@flowdular/sdk':
-        specifier: 0.1.0
-        version: 0.1.0(@types/node@24.13.3)(esbuild@0.28.2)(typescript@5.9.3)(zod@4.5.4)
+        specifier: 0.3.1
+        version: 0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
       octane:
         specifier: 0.1.51
-        version: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+        version: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
       segment-state:
         specifier: 0.2.0
-        version: 0.2.0(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
+        version: 0.2.0(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0)))
     devDependencies:
       '@tsrx/typescript-plugin':
         specifier: 0.3.120
@@ -77,14 +77,14 @@ importers:
   modules/parties:
     dependencies:
       '@flowdular/sdk':
-        specifier: 0.1.0
-        version: 0.1.0(@types/node@24.13.3)(esbuild@0.28.2)(typescript@5.9.3)(zod@4.5.4)
+        specifier: 0.3.1
+        version: 0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
       octane:
         specifier: 0.1.51
-        version: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+        version: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
       segment-state:
         specifier: 0.2.0
-        version: 0.2.0(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
+        version: 0.2.0(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0)))
     devDependencies:
       '@tsrx/typescript-plugin':
         specifier: 0.3.120
@@ -102,8 +102,8 @@ importers:
   platform:
     dependencies:
       '@flowdular/sdk':
-        specifier: 0.1.0
-        version: 0.1.0(@types/node@24.13.3)(esbuild@0.28.2)(typescript@5.9.3)(zod@4.5.4)
+        specifier: 0.3.1
+        version: 0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
 
   tests/consumer:
     dependencies:
@@ -114,8 +114,8 @@ importers:
         specifier: workspace:*
         version: link:../../modules/parties
       '@flowdular/sdk':
-        specifier: 0.1.0
-        version: 0.1.0(@types/node@24.13.3)(esbuild@0.28.2)(typescript@5.9.3)(zod@4.5.4)
+        specifier: 0.3.1
+        version: 0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
     devDependencies:
       '@tsrx/typescript-plugin':
         specifier: 0.3.120
@@ -340,10 +340,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@flowdular/sdk@0.1.0':
-    resolution: {integrity: sha512-7q2l+zlV63CP2xG3poPW85scYxc5s2s2Z74KGXfp6C9BUOn4/xH0Mw/cSrruBGXAv2nVvsphCnaQT8AlMfrDOQ==}
+  '@flowdular/sdk@0.3.1':
+    resolution: {integrity: sha512-yfeq6sMfWGZ83bUlHj/m0QjcjlS7zIXTO6QwWgudQ7bSv5g3kWQ/Cxs68a90pXdQ7uyrh3KWVayGTYur8GnzmA==}
     engines: {node: '>=22.22.2'}
-    hasBin: true
 
   '@fontsource-variable/ibm-plex-sans@5.3.0':
     resolution: {integrity: sha512-agG8tXFEo0hD9+J7npa4vbbWult52eMLVaQ6WQRlhs/iCAojrMAoejru85W9HTVXHfyUj96KM7gp/KGAS87XaQ==}
@@ -370,8 +369,53 @@ packages:
       '@types/node':
         optional: true
 
+  '@inquirer/checkbox@5.2.5':
+    resolution: {integrity: sha512-bRt8J8m+Fot9CXv+zNQGXUq2ET0MggR1fPz7v6edN6MFYmsbfGnMmkmWZJEegMKqrAC8ej/o1sqisHZXZJMAfQ==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/confirm@6.3.2':
+    resolution: {integrity: sha512-Xvr/0HggjddPtGppuqVmxhTw+Hr8PvsZ/k0HmOEaAqQEt80OITNkFWnsdNmyT0/eM4Ab+iJLx2R8rctlEyfSVg==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   '@inquirer/core@12.0.3':
     resolution: {integrity: sha512-wsSy0sznmXwkty+2PzZwx00Cazc/E0r0B7mAzdGROz2Ct+DFZXaK7WDjGZvgjRldxH5ZhFVfF2lgkYrqgOw2KA==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/editor@5.3.3':
+    resolution: {integrity: sha512-YsKkS2q63IiLtaDK/9nqzdComN97SDQrmKiyNggN+ceP4ty+Z6VwyTz3FpjeUWeW1Efss2xHFKCC9sx7hnrsxg==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/expand@5.1.5':
+    resolution: {integrity: sha512-uHuXLmXW+TtIfT/9vSBotypAkqn1n34Ul+CLGPos/xANyO4Ff5xZzkYhbKR4NEcfVK4a9mHQOpwVZzluSHFRGw==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/external-editor@3.0.5':
+    resolution: {integrity: sha512-f3QQJRIX5ZEneBHNUIuPjmbdzHnmRFJA8r2dkcb8q+OM5Uv5KtnuAttQumnrjcBVBM3mcTX1CkmtAkU58VRZxg==}
     engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
     peerDependencies:
       '@types/node': '>=18'
@@ -382,6 +426,69 @@ packages:
   '@inquirer/figures@2.0.9':
     resolution: {integrity: sha512-EAWgUTGQ/Umgga51dE3B2PUHbufuXarDfg86uVgoSgNHNNQnyFKcOrQLWVqYMghuSyHh8+2HUH0Js9cTC1WAdg==}
     engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+
+  '@inquirer/input@5.1.6':
+    resolution: {integrity: sha512-HtcJhB2QFVXbLuJ5S3syhNbTUVxYvwqV4VRBDkQceBloC9bmTViUoRFP5PbSaDZb3HzfPmpuU/gG4ybVBz4FHA==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/number@4.2.3':
+    resolution: {integrity: sha512-6Yuwh1NGSbu1Lo4N1EWjXs1jKRntLg/ZCwhmeorEHde90v1XxAozdbd4Iu30eOQLW+6h1hp2O9ujNfLSbTPJnA==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/password@5.2.2':
+    resolution: {integrity: sha512-W9zYdyzogK+6110mqwaSJWCBu2yA5Q/OfnGSjjZB1bNpHlmUozXxTl0+QOZBNeVd6Qo81/qT75gW05gLAtITxw==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/prompts@8.7.2':
+    resolution: {integrity: sha512-QoRB4wFIjgH5iOhSjoIKMkTvSHDuV+O3OITlIqAYO0oK5x364GJILXiMBvlPiE+klg7Xx9tq5XVqQHcGUDYYPA==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/rawlist@5.3.5':
+    resolution: {integrity: sha512-1oHky1ONfCOwNrnkQGDE1oaSij/3fI6HFMSf2H/WsGO2lEyDX9My82iggITSy9ddSZ8yk8j9v41OI0fVoSIoaA==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/search@4.3.3':
+    resolution: {integrity: sha512-fyuIU1Nbpvwlikjg3gXwJFDI11+EFjqQ7P+iByfmivIKQ1vmaykNrD/vy5unHuUqUpsOsnvJ25//tPF7E/RBRA==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/select@5.2.5':
+    resolution: {integrity: sha512-9kc15hr8r/kI+3DO/xLog5nOzTz1jqsHXa6JBFzmQKhkoJ8Slda1I1L/uD8ZSZ9tF1yp79wwXe7mclvX1rqR2Q==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^20.17.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   '@inquirer/type@4.1.1':
     resolution: {integrity: sha512-yJoHYrMnxIsJZCY+0Vb66Dy3he3kL3e2wOBKhoSwWWAzZAY82emlxwgprCtp6yRixvNRNq9ztfRWQYPNr3Go7A==}
@@ -459,14 +566,6 @@ packages:
     engines: {node: '>=22.22.2'}
     peerDependencies:
       octane: ^0.1.51 || ^0.2.0
-
-  '@octanejs/vite-plugin@0.1.51':
-    resolution: {integrity: sha512-Qpl9d5V3Zz0iPiBb5t7wTaZq1Px6WyGIEPieSJ5ZqttSIf7pgSrsqVktppNlWsJKFAVPOInakbCPH3kdF8VFlA==}
-    engines: {node: '>=22.22.2'}
-    hasBin: true
-    peerDependencies:
-      octane: 0.1.51
-      vite: ^8.0.16
 
   '@octokit/auth-token@6.0.0':
     resolution: {integrity: sha512-P4YJBPdPSpWTQ1NU4XYdvHvXJJDxM6YwpS0FZHRgP7YFkdVxsWcpWGy/NVqlAA7PcPCnMacXlRm1y2PFZRWL/w==}
@@ -1206,6 +1305,9 @@ packages:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
     engines: {node: '>=18'}
 
+  chardet@2.2.0:
+    resolution: {integrity: sha512-rddelWYNPRrXq6PtNEN2S3f6t9ILzvqaN5pVgi4kqt9jHQaXIial9PznB5iSPVlQSLNaaH22ItWz3EJtQ10+OA==}
+
   chart.js@4.5.1:
     resolution: {integrity: sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==}
     engines: {pnpm: '>=8'}
@@ -1265,8 +1367,8 @@ packages:
     resolution: {integrity: sha512-tJtZBBHA6vjIAaF6EnIaq6laBBP9aq/Y3ouVJjEfoHbRBcHBAHYcMh/w8LDrk2PvIMMq8gmopa5D4V8RmbrxGw==}
     engines: {node: '>= 0.10'}
 
-  create-flowdular@0.1.0:
-    resolution: {integrity: sha512-bfVzulbEkLwHyCoi1liWaCfpd4weX4oe/VQY72TeeKxhIg0B+AM3s8KKLU/Tt0Sju+b1tvEV0xtGENLa+aOCQA==}
+  create-flowdular@0.3.1:
+    resolution: {integrity: sha512-TcLjlIPv4LKOmRZ+VTCAlEkgisdGKLV0SbxAYWhBfwQJPH8QVwoSDA+rQ2RX+vBW/n7DZTeQdnivMj3+OPkiaA==}
     engines: {node: '>=22.22.2'}
     hasBin: true
 
@@ -1488,8 +1590,8 @@ packages:
     resolution: {integrity: sha512-S8KoZgRZN+a5rNwqTxlZZePjT/4cnm0ROV70LedRHZ0p8u9fRID0hJUZQpkKLzro8LfmC8sx23bY6tVNxv8pQA==}
     engines: {node: '>= 18.0.0'}
 
-  flowdular@0.1.0:
-    resolution: {integrity: sha512-l55nxsJoj5wgK8iG/4faVbC8/qIbeCEWU2Dp5GrbJcg+hVBgOTJmrbncAZaU1slJoqndJUVdzGP4Hpnj9LBPJw==}
+  flowdular@0.3.1:
+    resolution: {integrity: sha512-hfqsHTDiy7GeMEjCzcOZZBPDg8Hg2jM6uJr5zPBDDNt/m9ZvGl7i2nv9+VRjZPbQDDnmg7sgsASOKWU8hfo4BA==}
     hasBin: true
 
   follow-redirects@1.16.0:
@@ -1856,6 +1958,10 @@ packages:
     resolution: {integrity: sha512-NMPBRMJgiQHjbd8phG3Vebdx4kZ1H121rbl5IkMqeOsahptB9BKo/d7oJ3zTXqTgagn2bWlNSXkh0QUGM31RYg==}
     engines: {node: '>=18'}
 
+  nodemailer@10.0.3:
+    resolution: {integrity: sha512-h5c8ypcMoOIh44bIcVROvTDbjRdOJX8AXTkxMht2C92HlSjkG+/8kjoqmNPypfjQaVNaUHWyZ3tqs5I3K91F3g==}
+    engines: {node: '>=20.0.0'}
+
   npm-run-path@6.0.0:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
@@ -2107,6 +2213,18 @@ packages:
 
   segment-state@0.2.0:
     resolution: {integrity: sha512-YcKm8R7UQPE1v7HwvE+Gelro1WdsHCN7iU5c4lesK2vL0R0ccOnCp7ZsE6jnmM+ilQqrSJiOIs+8btOkHF8YYA==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      octane: ^0.1.21
+      react: ^19.0.0
+    peerDependenciesMeta:
+      octane:
+        optional: true
+      react:
+        optional: true
+
+  segment-state@0.2.1:
+    resolution: {integrity: sha512-bzfEMl+c5M+s2ndUctuvGazql9LghmvGOhwqe3kt00dmsSNoN7fBTg2OLD1ZgMtd+PV3W3x1ReW4UZMDED8dcw==}
     engines: {node: '>=22'}
     peerDependencies:
       octane: ^0.1.21
@@ -2671,7 +2789,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@flowdular/sdk@0.1.0(@types/node@24.13.3)(esbuild@0.28.2)(typescript@5.9.3)(zod@4.5.4)':
+  '@flowdular/sdk@0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)':
     dependencies:
       '@ai-sdk/anthropic': 4.0.46(zod@4.5.4)
       '@ai-sdk/azure': 4.0.54(zod@4.5.4)
@@ -2681,42 +2799,31 @@ snapshots:
       '@electric-sql/pglite': 0.5.8
       '@fontsource-variable/ibm-plex-sans': 5.3.0
       '@fontsource/ibm-plex-mono': 5.2.7
-      '@octanejs/app-core': 0.0.47(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
-      '@octanejs/seo': 0.0.38(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
-      '@octanejs/tanstack-table': 0.1.51(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
-      '@octanejs/vite-plugin': 0.1.51(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+      '@octanejs/app-core': 0.0.47(octane@0.1.51(typescript@5.9.3))
+      '@octanejs/seo': 0.0.38(octane@0.1.51(typescript@5.9.3))
+      '@octanejs/tanstack-table': 0.1.51(octane@0.1.51(typescript@5.9.3))
       '@types/pg': 8.23.1
       '@types/semver': 7.7.1
       ai: 7.0.85(zod@4.5.4)
       chart.js: 4.5.1
-      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+      nodemailer: 10.0.3
+      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
       pg: 8.23.0
-      segment-state: 0.2.0(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
+      segment-state: 0.2.1(octane@0.1.51(typescript@5.9.3))
       semver: 7.7.4
-      vite: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0)
       yaml: 2.9.0
     transitivePeerDependencies:
-      - '@types/node'
       - '@typescript-eslint/types'
-      - '@vitejs/devtools'
-      - esbuild
-      - jiti
-      - less
       - pg-native
       - react
       - react-dom
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
       - svelte
-      - terser
-      - tsx
       - typescript
+      - vite
       - vite-plus
       - zod
 
-  '@flowdular/sdk@0.1.0(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3)':
+  '@flowdular/sdk@0.3.1(typescript@5.9.3)(zod@4.4.3)':
     dependencies:
       '@ai-sdk/anthropic': 4.0.46(zod@4.4.3)
       '@ai-sdk/azure': 4.0.54(zod@4.4.3)
@@ -2726,38 +2833,27 @@ snapshots:
       '@electric-sql/pglite': 0.5.8
       '@fontsource-variable/ibm-plex-sans': 5.3.0
       '@fontsource/ibm-plex-mono': 5.2.7
-      '@octanejs/app-core': 0.0.47(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
-      '@octanejs/seo': 0.0.38(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
-      '@octanejs/tanstack-table': 0.1.51(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
-      '@octanejs/vite-plugin': 0.1.51(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+      '@octanejs/app-core': 0.0.47(octane@0.1.51(typescript@5.9.3))
+      '@octanejs/seo': 0.0.38(octane@0.1.51(typescript@5.9.3))
+      '@octanejs/tanstack-table': 0.1.51(octane@0.1.51(typescript@5.9.3))
       '@types/pg': 8.23.1
       '@types/semver': 7.7.1
       ai: 7.0.85(zod@4.4.3)
       chart.js: 4.5.1
-      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+      nodemailer: 10.0.3
+      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
       pg: 8.23.0
-      segment-state: 0.2.0(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
+      segment-state: 0.2.1(octane@0.1.51(typescript@5.9.3))
       semver: 7.7.4
-      vite: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0)
       yaml: 2.9.0
     transitivePeerDependencies:
-      - '@types/node'
       - '@typescript-eslint/types'
-      - '@vitejs/devtools'
-      - esbuild
-      - jiti
-      - less
       - pg-native
       - react
       - react-dom
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
       - svelte
-      - terser
-      - tsx
       - typescript
+      - vite
       - vite-plus
       - zod
 
@@ -2780,6 +2876,22 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.13.3
 
+  '@inquirer/checkbox@5.2.5(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/ansi': 2.0.8
+      '@inquirer/core': 12.0.3(@types/node@24.13.3)
+      '@inquirer/figures': 2.0.9
+      '@inquirer/type': 4.1.1(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
+
+  '@inquirer/confirm@6.3.2(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/core': 12.0.3(@types/node@24.13.3)
+      '@inquirer/type': 4.1.1(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
+
   '@inquirer/core@12.0.3(@types/node@24.13.3)':
     dependencies:
       '@inquirer/ansi': 2.0.8
@@ -2792,7 +2904,90 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.13.3
 
+  '@inquirer/editor@5.3.3(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/core': 12.0.3(@types/node@24.13.3)
+      '@inquirer/external-editor': 3.0.5(@types/node@24.13.3)
+      '@inquirer/type': 4.1.1(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
+
+  '@inquirer/expand@5.1.5(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/core': 12.0.3(@types/node@24.13.3)
+      '@inquirer/type': 4.1.1(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
+
+  '@inquirer/external-editor@3.0.5(@types/node@24.13.3)':
+    dependencies:
+      chardet: 2.2.0
+      iconv-lite: 0.7.3
+    optionalDependencies:
+      '@types/node': 24.13.3
+
   '@inquirer/figures@2.0.9': {}
+
+  '@inquirer/input@5.1.6(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/core': 12.0.3(@types/node@24.13.3)
+      '@inquirer/type': 4.1.1(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
+
+  '@inquirer/number@4.2.3(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/core': 12.0.3(@types/node@24.13.3)
+      '@inquirer/type': 4.1.1(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
+
+  '@inquirer/password@5.2.2(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/ansi': 2.0.8
+      '@inquirer/core': 12.0.3(@types/node@24.13.3)
+      '@inquirer/type': 4.1.1(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
+
+  '@inquirer/prompts@8.7.2(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/checkbox': 5.2.5(@types/node@24.13.3)
+      '@inquirer/confirm': 6.3.2(@types/node@24.13.3)
+      '@inquirer/editor': 5.3.3(@types/node@24.13.3)
+      '@inquirer/expand': 5.1.5(@types/node@24.13.3)
+      '@inquirer/input': 5.1.6(@types/node@24.13.3)
+      '@inquirer/number': 4.2.3(@types/node@24.13.3)
+      '@inquirer/password': 5.2.2(@types/node@24.13.3)
+      '@inquirer/rawlist': 5.3.5(@types/node@24.13.3)
+      '@inquirer/search': 4.3.3(@types/node@24.13.3)
+      '@inquirer/select': 5.2.5(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
+
+  '@inquirer/rawlist@5.3.5(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/core': 12.0.3(@types/node@24.13.3)
+      '@inquirer/type': 4.1.1(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
+
+  '@inquirer/search@4.3.3(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/core': 12.0.3(@types/node@24.13.3)
+      '@inquirer/figures': 2.0.9
+      '@inquirer/type': 4.1.1(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
+
+  '@inquirer/select@5.2.5(@types/node@24.13.3)':
+    dependencies:
+      '@inquirer/ansi': 2.0.8
+      '@inquirer/core': 12.0.3(@types/node@24.13.3)
+      '@inquirer/figures': 2.0.9
+      '@inquirer/type': 4.1.1(@types/node@24.13.3)
+    optionalDependencies:
+      '@types/node': 24.13.3
 
   '@inquirer/type@4.1.1(@types/node@24.13.3)':
     optionalDependencies:
@@ -2879,33 +3074,26 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.3
 
-  '@octanejs/app-core@0.0.47(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))':
+  '@octanejs/app-core@0.0.47(octane@0.1.51(typescript@5.9.3))':
     dependencies:
       '@ripple-ts/adapter': 0.3.128
       esbuild: 0.28.2
-      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
 
-  '@octanejs/seo@0.0.38(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))':
+  '@octanejs/seo@0.0.38(octane@0.1.51(typescript@5.9.3))':
     dependencies:
-      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
 
-  '@octanejs/tanstack-store@0.0.48(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))':
+  '@octanejs/tanstack-store@0.0.48(octane@0.1.51(typescript@5.9.3))':
     dependencies:
       '@tanstack/store': 0.11.0
-      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
 
-  '@octanejs/tanstack-table@0.1.51(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))':
+  '@octanejs/tanstack-table@0.1.51(octane@0.1.51(typescript@5.9.3))':
     dependencies:
-      '@octanejs/tanstack-store': 0.0.48(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
+      '@octanejs/tanstack-store': 0.0.48(octane@0.1.51(typescript@5.9.3))
       '@tanstack/table-core': 9.0.0-beta.58
-      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
-
-  '@octanejs/vite-plugin@0.1.51(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))':
-    dependencies:
-      '@octanejs/app-core': 0.0.47(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)))
-      '@ripple-ts/adapter': 0.3.128
-      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
-      vite: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0)
+      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
 
   '@octokit/auth-token@6.0.0': {}
 
@@ -3269,7 +3457,7 @@ snapshots:
       '@volar/typescript': 2.4.28
       typescript: 5.9.3
     optionalDependencies:
-      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
 
   '@types/chai@5.2.3':
     dependencies:
@@ -3464,6 +3652,8 @@ snapshots:
 
   chai@6.2.2: {}
 
+  chardet@2.2.0: {}
+
   chart.js@4.5.1:
     dependencies:
       '@kurkle/color': 0.3.4
@@ -3508,7 +3698,7 @@ snapshots:
       object-assign: 4.1.1
       vary: 1.1.2
 
-  create-flowdular@0.1.0: {}
+  create-flowdular@0.3.1: {}
 
   cross-spawn@7.0.6:
     dependencies:
@@ -3782,31 +3972,23 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  flowdular@0.1.0(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3):
+  flowdular@0.3.1(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3):
     dependencies:
       '@electric-sql/pglite': 0.5.8
-      '@flowdular/sdk': 0.1.0(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3)
+      '@flowdular/sdk': 0.3.1(typescript@5.9.3)(zod@4.4.3)
+      '@inquirer/prompts': 8.7.2(@types/node@24.13.3)
       ajv: 8.20.0
       pg: 8.23.0
       yaml: 2.9.0
     transitivePeerDependencies:
       - '@types/node'
       - '@typescript-eslint/types'
-      - '@vitejs/devtools'
-      - esbuild
-      - jiti
-      - less
       - pg-native
       - react
       - react-dom
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
       - svelte
-      - terser
-      - tsx
       - typescript
+      - vite
       - vite-plus
       - zod
 
@@ -4132,6 +4314,8 @@ snapshots:
     dependencies:
       content-type: 2.1.0
 
+  nodemailer@10.0.3: {}
+
   npm-run-path@6.0.0:
     dependencies:
       path-key: 4.0.0
@@ -4143,7 +4327,7 @@ snapshots:
 
   obug@2.2.1: {}
 
-  octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0)):
+  octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0)):
     dependencies:
       '@tsrx/core': 0.1.69
       '@types/react': 19.2.18
@@ -4448,9 +4632,13 @@ snapshots:
       extend-shallow: 2.0.1
       kind-of: 6.0.3
 
-  segment-state@0.2.0(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))):
+  segment-state@0.2.0(octane@0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))):
     optionalDependencies:
-      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(yaml@2.9.0))
+      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
+
+  segment-state@0.2.1(octane@0.1.51(typescript@5.9.3)):
+    optionalDependencies:
+      octane: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
 
   semver@7.7.4: {}
 

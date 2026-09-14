@@ -3,7 +3,7 @@
 	"schemaVersion": 1,
 	"id": "expenses.core",
 	"package": "@flowdular/module-expenses",
-	"version": "0.7.0",
+	"version": "0.7.2",
 	"profile": "full",
 	"capabilities": ["api", "database", "client", "translations"],
 	"platform": {
