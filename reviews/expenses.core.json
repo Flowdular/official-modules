@@ -1,5 +1,5 @@
 {
-	"sourceSha256": "52c92c066fb8d96c9b578ba8f9a66c58b37e7c93bee631c9c26ebcda7a469d04",
+	"sourceSha256": "7f68f3de25b47d2e411f98586d223bfae4033d7c6badc352a048e4da8376771b",
 	"requirements": [
 		"Preserve source behavior, permissions and migrations byte-for-byte during repository transfer.",
 		"Resolve dependencies from the packed Flowdular SDK in an independent workspace.",
