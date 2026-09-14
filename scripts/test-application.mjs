@@ -63,6 +63,14 @@ for (const key of [
 const productionEnvironment = {
 	...environment,
 	NODE_ENV: 'production',
+	/* Production refuses the local storage adapter; the smoke never stores an
+	   object, so an S3 configuration that is only ever validated is enough. */
+	FD_STORAGE_ADAPTER: 's3',
+	FD_STORAGE_S3_BUCKET: 'registry-application',
+	FD_STORAGE_S3_REGION: 'us-east-1',
+	FD_STORAGE_S3_ENDPOINT: 'https://s3.invalid',
+	FD_STORAGE_S3_ACCESS_KEY_ID: 'registry',
+	FD_STORAGE_S3_SECRET_ACCESS_KEY: 'registry-secret',
 	FD_DATABASE_ADAPTER: 'postgresql',
 	FD_DATABASE_URL: `postgres://coreloom_runtime@127.0.0.1:${databasePort}/registry_application`,
 	FD_DATABASE_MIGRATOR_URL: `postgres://coreloom_migrator@127.0.0.1:${databasePort}/registry_application`,
@@ -155,12 +163,10 @@ try {
 	run('pnpm', ['flowdular', 'module', 'validate', '--locked']);
 	run('pnpm', ['typecheck']);
 	run('pnpm', ['test']);
-	run(
-		'pnpm',
-		['exec', 'vite', 'build'],
-		join(app, 'platform'),
-		productionEnvironment,
-	);
+	// The generated build script owns the build-time environment (an internal
+	// build flag, local adapters and throwaway keys); a production environment
+	// is for the built server, not for bundling it.
+	run('pnpm', ['--filter', '@app/platform', 'build']);
 	const entry = await realpath(join(app, 'platform/dist/server/entry.js'));
 	await stat(entry);
 	const client = join(app, 'platform/dist/client');
