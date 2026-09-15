@@ -104,6 +104,13 @@ describe('expenses migrations', () => {
 		expect((await status()).map((entry) => entry.state)).toEqual(
 			databaseMigrations.map(() => 'applied'),
 		);
+		for (const index of [
+			'expenses_claims_tenant_created_idx',
+			'expenses_claims_tenant_amount_idx',
+			'expenses_claims_tenant_expense_date_idx',
+		]) {
+			expect(await lease.database.schema.hasIndex(index), index).toBe(true);
+		}
 	});
 
 	it('adopts a schema that predates the ledger without changing its rows', async () => {

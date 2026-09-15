@@ -1,6 +1,6 @@
 schemaVersion: 1
 id: expenses.core
-specVersion: 0.7.2
+specVersion: 0.8.0
 status: approved
 name: Expense Claims
 description: Provides tenant-scoped expense claims with employee ownership, submission, manager decisions, status filtering, and approval reporting.
@@ -15,6 +15,11 @@ dependencies:
     range: ^0.7.0
   - id: auth.core
     range: ^0.13.0
+  - id: exports.core
+    range: ^0.2.0
+requires:
+  - id: exports.lists.v1
+    optional: true
 tenancy: required
 locales:
   - en
@@ -32,6 +37,9 @@ invariants:
   - A principal without approval permission can read only their own claims, while a principal with approval permission can read submitted claims awaiting a decision in the active tenant.
   - User-facing copy resolves from the active locale with English as the fallback and never renders a missing translation as empty content.
   - An expense note may reference only the linked fields in the same claim form; its raw template and one-pass resolved note are both retained without recursive resolution.
+  - The claims list is read one signed keyset page at a time over (sort column, id) in one direction, with limit at most 200 and 50 by default, sort keys createdAt (the default, newest first), amount and expenseDate, and status, category and title search filters applied in SQL. The cursor is signed with a module secret drawn at composition and binds the tenant, the sort, the direction and a digest of the filters, so a tampered, foreign-tenant, resorted or refiltered cursor answers 400 CURSOR_INVALID and an unknown sort answers 400 INVALID_INPUT. A cursor is answered only on a full page, and no unbounded claims read exists.
+  - The claims list export registered with exports.lists.v1 as expenses.core.claims declares the title, claimant, amount in minor units, currency, category, expense date, status and decision comment columns, is behind expenses.claims.read, and is walked by exports.core under the principal that started the job through the same page the list route answers, so a file never carries a row the screen would not have shown. A deployment without exports.core still composes expenses.core and registers nothing.
+  - The bulk routes approve-many, reject-many and submit-many are siblings of the single approve, reject and submit routes with the same permission and CSRF check, accept 1 to 100 unique claim ids, and run the single decision or submission path per id, so each row keeps its own history version and a missing or foreign-tenant id answers not-found while a claim in the wrong status or owned by someone else answers refused with the single route's code. A bulk decision with a blank comment records the fixed default bulk review comment, so a decided claim never stores an empty one.
   - The data class export writes every claim and every history revision of exactly one tenant, read in bounded pages inside the module's own tenant-scoped transaction. Neither class is swept or erased, because claims and their revision trail are accounting records that leave only when a person deletes a draft, and erasure is not a subject right over them.
 permissions:
   - id: expenses.claims.read
@@ -46,13 +54,25 @@ dataOwnership:
   - expenses.core declares the data classes expenses.core.claims (the expenses_claims table) and expenses.core.claims-history (the expenses_claims_history table); both are exportable with no retention period, and the export writes every row of the requesting tenant through the module service.
 acceptanceScenarios:
   - id: EXPENSES-LIST
-    given: Expense claims in different statuses exist for more than one claimant in the active tenant.
-    when: A principal with expenses.claims.read lists claims with no status filter or with draft, submitted, approved, or rejected selected.
-    then: A principal without expenses.claims.approve receives only their own matching claims, ordered by expense date newest first with a stable identifier tie-breaker.
+    given: Expense claims in different statuses and categories exist for more than one claimant in the active tenant.
+    when: A principal with expenses.claims.read lists claims with a sort key, a direction, a limit, a cursor, and any of the status, category and title search filters.
+    then: A principal without expenses.claims.approve receives one page of only their own matching claims in the requested order with the identifier as the tie-breaker, a principal with it also receives the tenant's submitted claims, two consecutive pages share no row and skip none, a full page carries the next cursor and a short page none, and a tampered, foreign-tenant, resorted or refiltered cursor answers 400 CURSOR_INVALID.
   - id: EXPENSES-APPROVAL-QUEUE
     given: Submitted claims from multiple claimants and claims in other statuses exist in the active tenant.
     when: A principal with expenses.claims.approve requests claims awaiting a decision.
-    then: Only submitted claims owned by the active tenant are returned, ordered by expense date newest first with a stable identifier tie-breaker.
+    then: Only submitted claims owned by the active tenant are returned, one signed page at a time in the same order and with the same cursor rules as the list.
+  - id: EXPENSES-LIST-EXPORT
+    given: exports.core composed either before or after expenses.core and a principal holding expenses.claims.read in a tenant with more visible claims than one export page carries.
+    when: exports.core walks expenses.core.claims for a job that principal started, while another tenant holds claims of its own.
+    then: The file carries the header and every claim the principal may read exactly once with its title, claimant, amount in minor units, currency, category, expense date, status and decision comment, no claim of the other tenant appears, the list is registered exactly once whichever module composed first, and a deployment without exports.core composes expenses.core with no list registered.
+  - id: EXPENSES-BULK-DECISION
+    given: Submitted claims, a draft, a foreign-tenant claim and a missing identifier are named together by a principal with expenses.claims.approve.
+    when: The principal calls approve-many or reject-many with 1 to 100 unique ids and an optional comment.
+    then: The server answers one outcome per id in order, updated for each submitted claim now decided with the comment or the default bulk review comment, not-found for the missing and foreign ids, refused with CLAIM_NOT_SUBMITTED for the draft, records one history version per decided row, and refuses an empty, oversized or repeated id list with 400 INVALID_INPUT and a bad CSRF token with 403 before any row changes.
+  - id: EXPENSES-BULK-SUBMIT
+    given: The principal's own drafts, another claimant's draft, a submitted claim and a missing identifier are named together by a principal with expenses.claims.manage.
+    when: The principal calls submit-many.
+    then: The server answers updated for each own draft now submitted, refused with CLAIM_NOT_OWNED or CLAIM_NOT_DRAFT for the others, not-found for the missing id, and records one history version per submitted row.
   - id: EXPENSES-CREATE
     given: A principal with expenses.claims.manage supplies a title, non-negative integer minor-unit amount, three-letter currency code, allowed category, valid expense date, and optional note.
     when: The principal creates an expense claim.
@@ -103,12 +123,16 @@ acceptanceScenarios:
     then: The foreign claim is absent from lists, direct actions return 404 CLAIM_NOT_FOUND, and no foreign-tenant data changes.
   - id: EXPENSES-SCREEN
     given: The expense claims screen is opened by a principal with or without expenses.claims.read and its list request may be loading, empty, successful, or failed.
-    when: The principal views the list, changes the status filter, or starts a new claim.
-    then: The screen shows loading, empty, error, populated, filtered-empty, and denied outcomes; the full-width list reflects the selected status and the title, amount, currency, category, expense date, and optional note form opens in a drawer.
+    when: The principal views the list, sorts a column, changes the status or category filter, types a title search, moves between pages, or starts a new claim.
+    then: The screen shows loading, empty, error, populated, filtered-empty, and denied outcomes; the server-paged list keeps one cursor per visited page, resets them on a sort, filter, search or page size change, ignores a late answer to an older request, and the title, amount, currency, category, expense date, and optional note form opens in a drawer.
   - id: EXPENSES-DECISION-SCREEN
     given: A principal with expenses.claims.approve can see a submitted claim in the active tenant.
     when: The principal selects approve or reject from that claim and supplies a decision comment.
     then: The screen submits the selected decision, shows validation or server errors without losing the list, and refreshes the claim status and awaiting-approval count after success.
+  - id: EXPENSES-BULK-SCREEN
+    given: A principal with expenses.claims.approve or expenses.claims.manage sees a page of claims.
+    when: The principal selects rows and chooses Approve selected, Reject selected or Submit selected.
+    then: Only submitted claims are selectable for a decision and only drafts for a submission, an action with nothing decidable or submittable is disabled with a reason, a confirm dialog with an optional comment precedes a decision, the selection is emptied after the action and on every new listing, and a toast reports the updated, missing and refused counts.
   - id: EXPENSES-DASHBOARD
     given: Submitted and non-submitted claims exist in the active tenant.
     when: A principal with expenses.claims.approve opens the dashboard.

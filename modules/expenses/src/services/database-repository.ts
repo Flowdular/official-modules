@@ -17,12 +17,14 @@ import {
 } from '@flowdular/sdk/kernel';
 import type {
 	ExpenseClaimHistoryAction,
+	ExpenseClaimSort,
+	ExpenseClaimSortDirection,
 	ExpensesClaim,
 } from '../domain/types.ts';
 import { databaseMigrations } from './migration.ts';
 import type {
 	ExpenseClaimHistoryExport,
-	ExpenseClaimListQuery,
+	ExpenseClaimPageQuery,
 	ExpensesExportCursor,
 	ExpensesRepository,
 } from './repository.ts';
@@ -109,17 +111,50 @@ const CLAIM_COLUMNS = `id, tenant_id, claimant_id, title, amount_minor, currency
 
 /* SQL stays explicit. Nothing here is rewritten between placeholder styles, and
    every value travels in the adapter's parameter channel. */
-const LIST_BY_STATUS_FOR_TENANT = `SELECT ${CLAIM_COLUMNS} FROM expenses_claims
-	 WHERE tenant_id = $1 AND status = $2
-	 ORDER BY expense_date DESC, id`;
+const PAGE_FILTERS = `tenant_id = $1
+	   AND (claimant_id = $2 OR ($3::int = 1 AND status = 'submitted'))
+	   AND ($4::text IS NULL OR status = $4)
+	   AND ($5::text IS NULL OR category = $5)
+	   AND ($6::text IS NULL OR title ILIKE $6)`;
 
-const LIST_BY_CLAIMANT_AND_STATUS = `SELECT ${CLAIM_COLUMNS} FROM expenses_claims
-	 WHERE tenant_id = $1 AND claimant_id = $2 AND status = $3
-	 ORDER BY expense_date DESC, id`;
+/* The sort column and the cast its keyset value binds with. The column name is
+   interpolated from this table and never from a request. */
+const SORT_COLUMNS: Readonly<
+	Record<ExpenseClaimSort, { readonly column: string; readonly cast: string }>
+> = {
+	createdAt: { column: 'created_at', cast: 'bigint' },
+	amount: { column: 'amount_minor', cast: 'bigint' },
+	expenseDate: { column: 'expense_date', cast: 'text' },
+};
 
-const LIST_BY_CLAIMANT = `SELECT ${CLAIM_COLUMNS} FROM expenses_claims
-	 WHERE tenant_id = $1 AND claimant_id = $2
-	 ORDER BY expense_date DESC, id`;
+/* The page order and the keyset predicate are one decision: both columns run
+   in the same direction, which is the order the tenant-first indexes carry. */
+function pageStatement(
+	sort: ExpenseClaimSort,
+	direction: ExpenseClaimSortDirection,
+	keyset: boolean,
+): string {
+	const { column, cast } = SORT_COLUMNS[sort];
+	const order = direction === 'desc' ? 'DESC' : 'ASC';
+	const comparison = direction === 'desc' ? '<' : '>';
+	return keyset
+		? `SELECT ${CLAIM_COLUMNS} FROM expenses_claims
+	 WHERE ${PAGE_FILTERS}
+	   AND (${column}, id) ${comparison} ($7::${cast}, $8::text)
+	 ORDER BY ${column} ${order}, id ${order}
+	 LIMIT $9`
+		: `SELECT ${CLAIM_COLUMNS} FROM expenses_claims
+	 WHERE ${PAGE_FILTERS}
+	 ORDER BY ${column} ${order}, id ${order}
+	 LIMIT $7`;
+}
+
+/* The term is matched as a substring, so the three characters LIKE reads as
+   syntax are escaped with the backslash PostgreSQL takes as the default escape
+   character. */
+function likePattern(term: string): string {
+	return '%' + term.replace(/[\\%_]/g, (character) => '\\' + character) + '%';
+}
 
 const FIND = `SELECT ${CLAIM_COLUMNS} FROM expenses_claims
 	 WHERE tenant_id = $1 AND id = $2`;
@@ -180,25 +215,34 @@ export class DatabaseExpensesRepository implements ExpensesRepository {
 		private readonly readyPromise: Promise<void> = Promise.resolve(),
 	) {}
 
-	async list(query: ExpenseClaimListQuery): Promise<readonly ExpensesClaim[]> {
+	async page(query: ExpenseClaimPageQuery): Promise<readonly ExpensesClaim[]> {
 		await this.readyPromise;
-		const statement =
-			query.includeApprovalQueue && query.status === 'submitted'
-				? {
-						text: LIST_BY_STATUS_FOR_TENANT,
-						parameters: [query.tenantId, query.status],
-					}
-				: query.status !== null
-					? {
-							text: LIST_BY_CLAIMANT_AND_STATUS,
-							parameters: [query.tenantId, query.claimantId, query.status],
-						}
-					: {
-							text: LIST_BY_CLAIMANT,
-							parameters: [query.tenantId, query.claimantId],
-						};
+		const filters = [
+			query.tenantId,
+			query.claimantId,
+			query.includeApprovalQueue ? 1 : 0,
+			query.status,
+			query.category,
+			query.search === null ? null : likePattern(query.search),
+		];
 		const result = await this.database.transaction(
-			(transaction) => transaction.query<ExpensesClaimRow>(statement),
+			(transaction) =>
+				transaction.query<ExpensesClaimRow>({
+					text: pageStatement(
+						query.sort,
+						query.direction,
+						query.after !== null,
+					),
+					parameters:
+						query.after === null
+							? [...filters, query.limit]
+							: [
+									...filters,
+									query.after.sortValue,
+									query.after.id,
+									query.limit,
+								],
+				}),
 			{ access: 'read', tenantId: query.tenantId },
 		);
 		return result.rows.map(fromRow);

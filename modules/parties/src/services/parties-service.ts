@@ -7,12 +7,17 @@ import {
 	type HistoryPage,
 	type HistoryRequest,
 } from '@flowdular/sdk/kernel';
-import type {
-	CreatePartyInput,
-	Party,
-	PartyKind,
-	PatchPartyInput,
-	UpdatePartyInput,
+import {
+	PARTY_LIST_SORTS,
+	type CreatePartyInput,
+	type Party,
+	type PartyBulkOutcome,
+	type PartyKind,
+	type PartyListKeyset,
+	type PartyListPage,
+	type PartyListQuery,
+	type PatchPartyInput,
+	type UpdatePartyInput,
 } from '../domain/types.ts';
 import type { ExportCursor, PartyRepository } from './repository.ts';
 import {
@@ -27,6 +32,25 @@ export interface PartyIdempotencyRequest {
 
 /** Rows one export read fetches; every class pages at this size. */
 export const PARTY_EXPORT_PAGE = 200;
+
+/** The most rows one list read answers, and the most ids one bulk action names. */
+export const PARTY_PAGE_MAX_LIMIT = 200;
+export const PARTY_BULK_LIMIT = 100;
+export const PARTY_SEARCH_LENGTH = 120;
+
+export const DEFAULT_PARTY_LIST_QUERY: PartyListQuery = {
+	sort: 'name',
+	direction: 'asc',
+	kind: null,
+	status: null,
+	search: '',
+	hasVatId: false,
+};
+
+export interface PartyListInput extends PartyListQuery {
+	readonly limit: number;
+	readonly after: PartyListKeyset | null;
+}
 
 /** Walks every row of one tenant in (time, id) order and writes each to the sink. */
 async function exportPaged<T extends { readonly id: string }>(
@@ -120,6 +144,46 @@ function vatIdentifier(value: string | null | undefined): string | null {
 	return normalized;
 }
 
+function listQuery(input: PartyListQuery): PartyListQuery {
+	if (!PARTY_LIST_SORTS.includes(input.sort)) {
+		throw new PartyServiceError(
+			'INVALID_INPUT',
+			`sort must be one of ${PARTY_LIST_SORTS.join(', ')}.`,
+		);
+	}
+	if (input.direction !== 'asc' && input.direction !== 'desc') {
+		throw new PartyServiceError(
+			'INVALID_INPUT',
+			'direction must be asc or desc.',
+		);
+	}
+	if (
+		input.status !== null &&
+		input.status !== 'active' &&
+		input.status !== 'archived'
+	) {
+		throw new PartyServiceError(
+			'INVALID_INPUT',
+			'status must be active or archived.',
+		);
+	}
+	const search = input.search.trim();
+	if (search.length > PARTY_SEARCH_LENGTH) {
+		throw new PartyServiceError(
+			'INVALID_INPUT',
+			`search must contain at most ${PARTY_SEARCH_LENGTH} characters.`,
+		);
+	}
+	return {
+		sort: input.sort,
+		direction: input.direction,
+		kind: input.kind === null ? null : partyKind(input.kind),
+		status: input.status,
+		search,
+		hasVatId: input.hasVatId === true,
+	};
+}
+
 function trustedActor(actor: Actor): Actor {
 	const normalized = normalizeActor(actor);
 	if (!normalized) {
@@ -170,15 +234,31 @@ function patchInput(input: PatchPartyInput): PatchPartyInput {
 export class PartiesService {
 	constructor(private readonly repository: PartyRepository) {}
 
-	async list(tenantId: string): Promise<readonly Party[]> {
-		return await this.repository.list(bounded(tenantId, 'tenantId', 1, 128));
+	/* One keyset page in the order the query names. The keyset comes from the
+	   previous page's answer; the endpoint binds it to the query in its cursor. */
+	async list(tenantId: string, input: PartyListInput): Promise<PartyListPage> {
+		if (
+			!Number.isSafeInteger(input.limit) ||
+			input.limit < 1 ||
+			input.limit > PARTY_PAGE_MAX_LIMIT
+		) {
+			throw new PartyServiceError(
+				'INVALID_INPUT',
+				`limit must be an integer between 1 and ${PARTY_PAGE_MAX_LIMIT}.`,
+			);
+		}
+		return await this.repository.list(
+			bounded(tenantId, 'tenantId', 1, 128),
+			listQuery(input),
+			input.after,
+			input.limit,
+		);
 	}
 
 	async get(tenantId: string, id: string): Promise<Party | null> {
-		const trustedId = bounded(id, 'id', 1, 128);
-		return (
-			(await this.list(tenantId)).find((party) => party.id === trustedId) ??
-			null
+		return await this.repository.find(
+			bounded(tenantId, 'tenantId', 1, 128),
+			bounded(id, 'id', 1, 128),
 		);
 	}
 
@@ -291,6 +371,25 @@ export class PartiesService {
 		return await this.changeStatus(tenantId, id, 'active', actor);
 	}
 
+	/* The bulk actions take the single-row path once per id, so every row keeps
+	   its own history entry and its own refusal, and a missing or foreign id
+	   costs nobody else. */
+	archiveMany(
+		tenantId: string,
+		ids: readonly string[],
+		actor: Actor,
+	): Promise<readonly PartyBulkOutcome[]> {
+		return this.each(ids, (id) => this.archive(tenantId, id, actor));
+	}
+
+	restoreMany(
+		tenantId: string,
+		ids: readonly string[],
+		actor: Actor,
+	): Promise<readonly PartyBulkOutcome[]> {
+		return this.each(ids, (id) => this.restore(tenantId, id, actor));
+	}
+
 	async delete(tenantId: string, id: string, actor: Actor): Promise<void> {
 		const trustedTenantId = bounded(tenantId, 'tenantId', 1, 128);
 		const trustedId = bounded(id, 'id', 1, 128);
@@ -385,6 +484,33 @@ export class PartiesService {
 		);
 	}
 
+	private async each(
+		ids: readonly string[],
+		write: (id: string) => Promise<unknown>,
+	): Promise<readonly PartyBulkOutcome[]> {
+		if (ids.length < 1 || ids.length > PARTY_BULK_LIMIT) {
+			throw new PartyServiceError(
+				'INVALID_INPUT',
+				`ids must name between 1 and ${PARTY_BULK_LIMIT} parties.`,
+			);
+		}
+		const outcomes: PartyBulkOutcome[] = [];
+		for (const id of ids) {
+			try {
+				await write(id);
+				outcomes.push({ id, outcome: 'updated' });
+			} catch (error) {
+				if (!(error instanceof PartyServiceError)) throw error;
+				outcomes.push(
+					error.code === 'PARTY_NOT_FOUND'
+						? { id, outcome: 'not-found' }
+						: { id, outcome: 'refused', reason: error.code },
+				);
+			}
+		}
+		return outcomes;
+	}
+
 	private async changeStatus(
 		tenantId: string,
 		id: string,
@@ -408,6 +534,7 @@ export class PartiesService {
 	}
 
 	private newParty(tenantId: string, input: CreatePartyInput): Party {
+		const now = Date.now();
 		return {
 			id: randomUUID(),
 			tenantId: bounded(tenantId, 'tenantId', 1, 128),
@@ -417,7 +544,8 @@ export class PartiesService {
 			phone: optional(input.phone, 'phone', 40),
 			vatId: vatIdentifier(input.vatId),
 			status: 'active',
-			createdAt: Date.now(),
+			createdAt: now,
+			updatedAt: now,
 		};
 	}
 }

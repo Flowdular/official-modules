@@ -15,6 +15,7 @@ import { PARTY_PERMISSIONS } from '../src/acl/permissions.ts';
 import { registerPartyVariableSource } from '../src/domain/variables.ts';
 import {
 	closePartiesTestDatabases,
+	listAll,
 	partiesTestProvider,
 } from './support/database.ts';
 
@@ -174,10 +175,10 @@ describe('parties agent tools', () => {
 		)) as Party;
 		expect(created.tenantId).toBe('tenant-a');
 		await expect(
-			(await runtime.service()).list('tenant-a'),
+			listAll(await runtime.service(), 'tenant-a'),
 		).resolves.toHaveLength(1);
 		await expect(
-			(await runtime.service()).list('tenant-b'),
+			listAll(await runtime.service(), 'tenant-b'),
 		).resolves.toHaveLength(0);
 	});
 
@@ -213,7 +214,7 @@ describe('parties agent tools', () => {
 				})
 			).entries[0]?.actor,
 		).toEqual(actor);
-		await expect((await runtime.service()).list('tenant-b')).resolves.toEqual(
+		await expect(listAll(await runtime.service(), 'tenant-b')).resolves.toEqual(
 			[],
 		);
 	});

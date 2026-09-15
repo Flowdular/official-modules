@@ -81,7 +81,11 @@ describe('customer update tool', () => {
 			...original,
 			email: 'new@example.com',
 			phone: null,
+			updatedAt: expect.any(Number),
 		});
+		expect((updated as Party).updatedAt).toBeGreaterThanOrEqual(
+			original.updatedAt,
+		);
 		validateToolOutput(tool().outputSchema, updated);
 		expect((await history())[0]).toMatchObject({
 			action: 'updated',

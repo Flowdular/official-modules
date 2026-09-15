@@ -9,9 +9,14 @@ export interface PartiesClientContributionOptions {
 	readonly scopes: readonly string[];
 }
 
+/* exports.core's own scope, held here as a string: a deployment without that
+   module grants it to nobody, so the action is absent rather than refused. */
+const EXPORTS_MANAGE = 'exports.lists.manage';
+
 export function createPartiesClientContribution(
 	options: PartiesClientContributionOptions,
 ): ModuleClientContribution {
+	const has = (scope: string) => options.scopes.includes(scope);
 	return {
 		moduleId: 'parties.core',
 		translations: { en: translationsEn, pl: translationsPl },
@@ -51,7 +56,8 @@ export function createPartiesClientContribution(
 				render: () =>
 					<PartiesView
 						csrfToken={options.csrfToken}
-						canManage={options.scopes.includes(PARTY_PERMISSIONS.manage)}
+						canManage={has(PARTY_PERMISSIONS.manage)}
+						canExport={has(EXPORTS_MANAGE)}
 						kind="customer"
 					/>,
 			},
@@ -60,7 +66,8 @@ export function createPartiesClientContribution(
 				render: () =>
 					<PartiesView
 						csrfToken={options.csrfToken}
-						canManage={options.scopes.includes(PARTY_PERMISSIONS.manage)}
+						canManage={has(PARTY_PERMISSIONS.manage)}
+						canExport={has(EXPORTS_MANAGE)}
 						kind="supplier"
 					/>,
 			},

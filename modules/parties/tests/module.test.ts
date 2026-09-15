@@ -5,19 +5,21 @@ import {
 import { afterAll, afterEach, describe, expect, it } from 'vitest';
 import { PARTY_PERMISSIONS } from '../src/acl/permissions.ts';
 import { createPartyRoutes } from '../src/api/endpoints.ts';
-import { filterParties } from '../src/client/party-list.ts';
 import { moduleDefinition } from '../src/index.ts';
 import {
 	createPartiesRuntime,
 	type PartiesRuntime,
 } from '../src/server/runtime.ts';
 import {
+	DEFAULT_PARTY_LIST_QUERY,
 	PartiesService,
 	PartyServiceError,
+	type PartyListInput,
 } from '../src/services/parties-service.ts';
 import {
 	closePartiesTestDatabases,
 	createPartiesTestDatabase,
+	listAll,
 	partiesTestProvider,
 	type PartiesTestDatabase,
 } from './support/database.ts';
@@ -163,12 +165,12 @@ describe('parties.core', () => {
 			TEST_ACTOR,
 		);
 
-		expect((await service.list('tenant-a')).map((party) => party.name)).toEqual(
-			['Acme'],
-		);
-		expect((await service.list('tenant-b')).map((party) => party.name)).toEqual(
-			['Beta'],
-		);
+		expect(
+			(await listAll(service, 'tenant-a')).map((party) => party.name),
+		).toEqual(['Acme']);
+		expect(
+			(await listAll(service, 'tenant-b')).map((party) => party.name),
+		).toEqual(['Beta']);
 	});
 
 	it('stores optional VAT identifiers on create and update', async () => {
@@ -206,7 +208,7 @@ describe('parties.core', () => {
 			status: 'active',
 			createdAt: created.createdAt,
 		});
-		expect(await service.list('tenant-a')).toEqual([updated]);
+		expect(await listAll(service, 'tenant-a')).toEqual([updated]);
 	});
 
 	/* PostgreSQL hands BIGINT back as a string; an unnormalized read would
@@ -219,12 +221,12 @@ describe('parties.core', () => {
 			TEST_ACTOR,
 		);
 
-		const listed = (await service.list('tenant-a'))[0];
+		const listed = (await listAll(service, 'tenant-a'))[0];
 		expect(typeof listed?.createdAt).toBe('number');
 		expect(listed?.createdAt).toBe(created.createdAt);
 	});
 
-	it('filters parties by text and VAT identifier presence', async () => {
+	it('filters parties in SQL by kind, status, VAT presence and a search term', async () => {
 		const service = await partiesService();
 		await service.create(
 			'tenant-a',
@@ -253,27 +255,34 @@ describe('parties.core', () => {
 			},
 			TEST_ACTOR,
 		);
-		const parties = await service.list('tenant-a');
+		const shared = (await listAll(service, 'tenant-a')).find(
+			(party) => party.name === 'Shared',
+		)!;
+		await service.archive('tenant-a', shared.id, TEST_ACTOR);
+		const names = async (changes: Partial<PartyListInput>) =>
+			(
+				await service.list('tenant-a', {
+					...DEFAULT_PARTY_LIST_QUERY,
+					limit: 10,
+					after: null,
+					...changes,
+				})
+			).parties.map((party) => party.name);
 
-		expect(
-			filterParties(parties, 'beta', false).map((party) => party.name),
-		).toEqual(['Beta']);
-		expect(
-			filterParties(parties, 'billing', false).map((party) => party.name),
-		).toEqual(['Acme']);
-		expect(
-			filterParties(parties, 'pl123', false).map((party) => party.name),
-		).toEqual(['Acme']);
-		expect(filterParties(parties, '', true).map((party) => party.name)).toEqual(
-			['Acme'],
-		);
-		expect(filterParties(parties, 'beta', true)).toEqual([]);
-		expect(
-			filterParties(parties, '', false, 'customer').map((party) => party.name),
-		).toEqual(['Acme', 'Shared']);
-		expect(
-			filterParties(parties, '', false, 'supplier').map((party) => party.name),
-		).toEqual(['Beta', 'Shared']);
+		expect(await names({ search: 'BETA' })).toEqual(['Beta']);
+		expect(await names({ search: 'billing' })).toEqual(['Acme']);
+		expect(await names({ search: 'pl123' })).toEqual(['Acme']);
+		expect(await names({ search: '%' })).toEqual([]);
+		expect(await names({ hasVatId: true })).toEqual(['Acme']);
+		expect(await names({ search: 'beta', hasVatId: true })).toEqual([]);
+		expect(await names({ kind: 'customer' })).toEqual(['Acme', 'Shared']);
+		expect(await names({ kind: 'supplier' })).toEqual(['Beta', 'Shared']);
+		expect(await names({ kind: 'both' })).toEqual(['Shared']);
+		expect(await names({ status: 'active' })).toEqual(['Acme', 'Beta']);
+		expect(await names({ status: 'archived' })).toEqual(['Shared']);
+		expect(await names({ kind: 'supplier', status: 'active' })).toEqual([
+			'Beta',
+		]);
 	});
 
 	it.each(['PL-123', 'A'.repeat(21)])(
@@ -319,7 +328,7 @@ describe('parties.core', () => {
 			),
 		);
 		expect(error).toMatchObject({ code: 'PARTY_NOT_FOUND', status: 404 });
-		expect(await service.list('tenant-b')).toMatchObject([
+		expect(await listAll(service, 'tenant-b')).toMatchObject([
 			{ id: party.id, name: 'Beta', vatId: 'GB123' },
 		]);
 	});
@@ -349,7 +358,7 @@ describe('parties.core', () => {
 		await service.archive('tenant-a', party.id, TEST_ACTOR);
 		await service.delete('tenant-a', party.id, TEST_ACTOR);
 
-		expect(await service.list('tenant-a')).toEqual([]);
+		expect(await listAll(service, 'tenant-a')).toEqual([]);
 		expect(
 			(
 				await service.history('tenant-a', {
@@ -379,7 +388,7 @@ describe('parties.core', () => {
 			service.archive('tenant-a', party.id, agent),
 		);
 		expect(error).toMatchObject({ code: 'PARTY_NOT_FOUND', status: 404 });
-		expect((await service.list('tenant-b'))[0]?.status).toBe('active');
+		expect((await listAll(service, 'tenant-b'))[0]?.status).toBe('active');
 
 		await service.archive('tenant-b', party.id, agent);
 		expect(
@@ -441,8 +450,9 @@ describe('parties.core', () => {
 				(transaction) =>
 					transaction.execute({
 						text: `INSERT INTO parties
-							 (id, tenant_id, name, kind, email, phone, vat_id, status, created_at)
-							 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+							 (id, tenant_id, name, kind, email, phone, vat_id, status,
+							  created_at, updated_at)
+							 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)`,
 						parameters: [
 							'forged',
 							'tenant-b',
@@ -595,6 +605,8 @@ describe('parties.core', () => {
 		['update', '/api/parties/update', 'POST'],
 		['archive', '/api/parties/archive', 'POST'],
 		['restore', '/api/parties/restore', 'POST'],
+		['archive-many', '/api/parties/archive-many', 'POST'],
+		['restore-many', '/api/parties/restore-many', 'POST'],
 		['delete', '/api/parties/delete', 'POST'],
 		['history', '/api/parties/history', 'GET'],
 	] as const)(
@@ -624,6 +636,8 @@ describe('parties.core', () => {
 		['update', '/api/parties/update', 'POST'],
 		['archive', '/api/parties/archive', 'POST'],
 		['restore', '/api/parties/restore', 'POST'],
+		['archive-many', '/api/parties/archive-many', 'POST'],
+		['restore-many', '/api/parties/restore-many', 'POST'],
 		['delete', '/api/parties/delete', 'POST'],
 		['history', '/api/parties/history', 'GET'],
 	] as const)(
@@ -650,6 +664,8 @@ describe('parties.core', () => {
 	it.each([
 		['archive', '/api/parties/archive'],
 		['restore', '/api/parties/restore'],
+		['archive-many', '/api/parties/archive-many'],
+		['restore-many', '/api/parties/restore-many'],
 		['delete', '/api/parties/delete'],
 	] as const)('requires CSRF protection for %s', async (_name, path) => {
 		const routes = createPartyRoutes(testAuthRuntime(), await partiesRuntime());

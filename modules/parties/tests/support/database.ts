@@ -1,9 +1,15 @@
 import type { DatabaseHandle, DatabaseProvider } from '@flowdular/sdk/database';
 import { createTestDatabaseProvider } from '@flowdular/sdk/database-testing';
+import type { Party } from '../../src/domain/types.ts';
 import {
 	DatabasePartyRepository,
 	migratePartiesDatabase,
 } from '../../src/services/database-repository.ts';
+import {
+	DEFAULT_PARTY_LIST_QUERY,
+	PARTY_PAGE_MAX_LIMIT,
+	type PartiesService,
+} from '../../src/services/parties-service.ts';
 
 const TENANT_TABLES = [
 	'parties',
@@ -73,4 +79,23 @@ export async function closePartiesTestDatabases(): Promise<void> {
 	const provider = shared;
 	shared = undefined;
 	if (provider) await (await provider).dispose();
+}
+
+/** Every party of one tenant in the default order, walked page by page. */
+export async function listAll(
+	service: PartiesService,
+	tenantId: string,
+): Promise<readonly Party[]> {
+	const parties: Party[] = [];
+	let after = null;
+	for (;;) {
+		const page = await service.list(tenantId, {
+			...DEFAULT_PARTY_LIST_QUERY,
+			limit: PARTY_PAGE_MAX_LIMIT,
+			after,
+		});
+		parties.push(...page.parties);
+		if (!page.next) return parties;
+		after = page.next;
+	}
 }

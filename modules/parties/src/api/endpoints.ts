@@ -3,8 +3,10 @@ import {
 	HttpProblem,
 	jsonResponse,
 	optionalString,
+	pageResponse,
 	problemResponse,
 	readJsonObject,
+	readPageQuery,
 	requiredString,
 } from '@flowdular/sdk/server';
 import { parseHistoryRequest } from '@flowdular/sdk/kernel';
@@ -21,8 +23,21 @@ import type {
 	PartyKind,
 	UpdatePartyInput,
 } from '../domain/types.ts';
-import { PartyServiceError } from '../services/parties-service.ts';
+import {
+	PARTY_BULK_LIMIT,
+	PARTY_PAGE_MAX_LIMIT,
+	PartyServiceError,
+} from '../services/parties-service.ts';
 import type { PartiesRuntime } from '../server/runtime.ts';
+import {
+	createPartyListing,
+	PARTY_PAGE_LIMIT,
+	partyListQuery,
+	type PartyListing,
+} from './listing.ts';
+
+/* A hundred ids of 128 characters with their JSON around them. */
+const BULK_BODY_BYTES = 32 * 1_024;
 
 function failure(error: unknown): Response {
 	if (error instanceof PartyServiceError) {
@@ -52,19 +67,60 @@ function partyInput(value: Record<string, unknown>): CreatePartyInput {
 	};
 }
 
-export function createPartyRoutes(auth: AuthRuntime, runtime: PartiesRuntime) {
+function partyIds(value: Record<string, unknown>): readonly string[] {
+	const raw = value.ids;
+	if (!Array.isArray(raw)) {
+		throw new HttpProblem('INVALID_INPUT', 'ids must be an array.', 400);
+	}
+	if (raw.length < 1 || raw.length > PARTY_BULK_LIMIT) {
+		throw new HttpProblem(
+			'INVALID_INPUT',
+			`ids must name between 1 and ${PARTY_BULK_LIMIT} parties.`,
+			400,
+		);
+	}
+	const ids = raw.map((entry) =>
+		requiredString({ id: entry }, 'id', { max: 128 }),
+	);
+	if (new Set(ids).size !== ids.length) {
+		throw new HttpProblem('INVALID_INPUT', 'ids must not repeat an id.', 400);
+	}
+	return ids;
+}
+
+export function createPartyRoutes(
+	auth: AuthRuntime,
+	runtime: PartiesRuntime,
+	listing: PartyListing = createPartyListing(runtime),
+) {
 	const list = defineEndpoint({
 		id: 'parties.records.list',
 		path: '/api/parties',
 		methods: ['GET'],
 		access: { kind: 'permission', permission: PARTY_PERMISSIONS.read },
 		resolveIdentity: endpointIdentityFromContext,
-		handler: async ({ octane }) =>
-			jsonResponse({
-				parties: await (
-					await runtime.service()
-				).list(principalFromContext(octane)!.tenantId),
-			}),
+		handler: async ({ octane }) => {
+			try {
+				const url = new URL(octane.request.url);
+				const page = readPageQuery(url, {
+					maxLimit: PARTY_PAGE_MAX_LIMIT,
+					defaultLimit: PARTY_PAGE_LIMIT,
+				});
+				const result = await listing.page(
+					principalFromContext(octane)!.tenantId,
+					partyListQuery(url),
+					page.cursor,
+					page.limit,
+				);
+				return pageResponse({
+					items: result.items,
+					limit: page.limit,
+					nextCursor: result.nextCursor,
+				});
+			} catch (error) {
+				return failure(error);
+			}
+		},
 	});
 	const create = defineEndpoint({
 		id: 'parties.records.create',
@@ -170,6 +226,47 @@ export function createPartyRoutes(auth: AuthRuntime, runtime: PartiesRuntime) {
 			}
 		},
 	});
+	/* Each bulk route is the sibling of its single-row route: same permission,
+	   same session check, one outcome per id through the same service path. */
+	const statusMany = (
+		id: string,
+		path: string,
+		action: 'archiveMany' | 'restoreMany',
+	) =>
+		defineEndpoint({
+			id,
+			path,
+			methods: ['POST'],
+			access: { kind: 'permission', permission: PARTY_PERMISSIONS.manage },
+			resolveIdentity: endpointIdentityFromContext,
+			handler: async ({ octane }) => {
+				const denial = sessionMutationDenial(octane, auth);
+				if (denial) return denial;
+				try {
+					const service = await runtime.service();
+					const value = await readJsonObject(octane.request, BULK_BODY_BYTES);
+					return jsonResponse({
+						outcomes: await service[action](
+							principalFromContext(octane)!.tenantId,
+							partyIds(value),
+							actorFromContext(octane)!,
+						),
+					});
+				} catch (error) {
+					return failure(error);
+				}
+			},
+		});
+	const archiveMany = statusMany(
+		'parties.records.archive-many',
+		'/api/parties/archive-many',
+		'archiveMany',
+	);
+	const restoreMany = statusMany(
+		'parties.records.restore-many',
+		'/api/parties/restore-many',
+		'restoreMany',
+	);
 	const remove = defineEndpoint({
 		id: 'parties.records.delete',
 		path: '/api/parties/delete',
@@ -233,6 +330,8 @@ export function createPartyRoutes(auth: AuthRuntime, runtime: PartiesRuntime) {
 		update.serverRoute,
 		archive.serverRoute,
 		restore.serverRoute,
+		archiveMany.serverRoute,
+		restoreMany.serverRoute,
 		remove.serverRoute,
 		history.serverRoute,
 	] as const;
@@ -244,6 +343,8 @@ export const endpoints = [
 	'parties.records.update',
 	'parties.records.archive',
 	'parties.records.restore',
+	'parties.records.archive-many',
+	'parties.records.restore-many',
 	'parties.records.delete',
 	'parties.records.history',
 ] as const;

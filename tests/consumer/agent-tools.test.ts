@@ -21,6 +21,25 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 const NO_USAGE = { inputTokens: 0, outputTokens: 0, totalTokens: 0 } as const;
 
+async function partyNames(
+	runtime: ReturnType<typeof createPartiesRuntime>,
+	tenantId: string,
+): Promise<readonly string[]> {
+	const page = await (
+		await runtime.service()
+	).list(tenantId, {
+		sort: 'name',
+		direction: 'asc',
+		kind: null,
+		status: null,
+		search: '',
+		hasVatId: false,
+		limit: 10,
+		after: null,
+	});
+	return page.parties.map((party) => party.name);
+}
+
 function request(
 	overrides: Partial<AgentExecutionRequest> = {},
 ): AgentExecutionRequest {
@@ -128,12 +147,8 @@ describe('platform agent tools through the harness', () => {
 		});
 		const replay = await harness.execute(request(), { provider });
 
-		await expect(
-			(await runtime.service()).list('tenant-a'),
-		).resolves.toHaveLength(1);
-		await expect(
-			(await runtime.service()).list('tenant-b'),
-		).resolves.toHaveLength(0);
+		await expect(partyNames(runtime, 'tenant-a')).resolves.toEqual(['Acme']);
+		await expect(partyNames(runtime, 'tenant-b')).resolves.toEqual([]);
 		expect(JSON.parse(result.output)).toMatchObject({
 			name: 'Acme',
 			kind: 'customer',
@@ -169,8 +184,6 @@ describe('platform agent tools through the harness', () => {
 			),
 		).toBe(true);
 		expect(events.some((event) => event.type === 'tool.started')).toBe(false);
-		await expect(
-			(await runtime.service()).list('tenant-denied'),
-		).resolves.toHaveLength(0);
+		await expect(partyNames(runtime, 'tenant-denied')).resolves.toEqual([]);
 	});
 });

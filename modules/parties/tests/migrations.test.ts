@@ -112,9 +112,10 @@ describe('parties migrations', () => {
 			(transaction) =>
 				transaction.execute({
 					text: `INSERT INTO parties
-				 (id, tenant_id, name, kind, email, phone, vat_id, status, created_at)
+				 (id, tenant_id, name, kind, email, phone, vat_id, status, created_at,
+				  updated_at)
 				 VALUES ('party-1', 'tenant-a', 'Contoso GmbH', 'customer', NULL, NULL,
-				         'DE811569869', 'active', 1)`,
+				         'DE811569869', 'active', 1, 1)`,
 				}),
 			{ tenantId: 'tenant-a', access: 'write' },
 		);
@@ -161,6 +162,45 @@ describe('parties migrations', () => {
 				)
 			).rows,
 		).toEqual([{ id: 'history-1' }]);
+	});
+
+	/* 0006 backfills a column the earlier migrations never wrote; a row that
+	   predates it must read back with its creation time as its update time. */
+	it('backfills updated_at and adds the list order indexes to an existing table', async () => {
+		const before = databaseMigrations.slice(0, 5);
+		await runDatabaseMigrations(lease.database, 'parties.core', before);
+		await lease.database.transaction(
+			(transaction) =>
+				transaction.execute({
+					text: `INSERT INTO parties
+				 (id, tenant_id, name, kind, email, phone, vat_id, status, created_at)
+				 VALUES ('party-1', 'tenant-a', 'Contoso GmbH', 'customer', NULL, NULL,
+				         NULL, 'active', 42)`,
+				}),
+			{ tenantId: 'tenant-a', access: 'write' },
+		);
+
+		expect((await apply()).map((entry) => entry.action)).toEqual([
+			...before.map(() => 'unchanged'),
+			'applied',
+		]);
+		expect(
+			(
+				await lease.database.transaction(
+					(transaction) =>
+						transaction.query<{ updated_at: string | number }>({
+							text: 'SELECT updated_at FROM parties',
+						}),
+					{ tenantId: 'tenant-a', access: 'read' },
+				)
+			).rows.map((row) => Number(row.updated_at)),
+		).toEqual([42]);
+		expect(
+			await lease.database.schema.hasIndex('parties_tenant_lower_name_idx'),
+		).toBe(true);
+		expect(
+			await lease.database.schema.hasIndex('parties_tenant_updated_at_idx'),
+		).toBe(true);
 	});
 
 	it('runs clean on a second migration pass', async () => {

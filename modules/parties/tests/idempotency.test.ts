@@ -12,6 +12,7 @@ import {
 } from '../src/server/runtime.ts';
 import {
 	closePartiesTestDatabases,
+	listAll,
 	partiesTestProvider,
 } from './support/database.ts';
 
@@ -132,7 +133,7 @@ describe('party target idempotency', () => {
 		)) as Party;
 		expect(replay).toEqual(first);
 		await expect(
-			(await recoveredRuntime.service()).list('tenant-a'),
+			listAll(await recoveredRuntime.service(), 'tenant-a'),
 		).resolves.toEqual([first]);
 		expect(
 			(
@@ -170,7 +171,7 @@ describe('party target idempotency', () => {
 		)) as Party;
 		expect(tenantB.tenantId).toBe('tenant-b');
 		await expect(
-			(await recoveredRuntime.service()).list('tenant-b'),
+			listAll(await recoveredRuntime.service(), 'tenant-b'),
 		).resolves.toHaveLength(1);
 	});
 
@@ -185,14 +186,14 @@ describe('party target idempotency', () => {
 		const actor = { kind: 'user', id: 'owner-1', label: 'Owner' } as const;
 		await (await runtime.service()).archive('tenant-a', created.id, actor);
 		await (await runtime.service()).delete('tenant-a', created.id, actor);
-		await expect((await runtime.service()).list('tenant-a')).resolves.toEqual(
+		await expect(listAll(await runtime.service(), 'tenant-a')).resolves.toEqual(
 			[],
 		);
 
 		expect(await create.execute(input, context('party-delete-key-1'))).toEqual(
 			created,
 		);
-		await expect((await runtime.service()).list('tenant-a')).resolves.toEqual(
+		await expect(listAll(await runtime.service(), 'tenant-a')).resolves.toEqual(
 			[],
 		);
 		expect(
@@ -242,9 +243,9 @@ describe('party target idempotency', () => {
 					context('party-rollback-key-1'),
 				),
 			).rejects.toThrow();
-			await expect((await runtime.service()).list('tenant-a')).resolves.toEqual(
-				[],
-			);
+			await expect(
+				listAll(await runtime.service(), 'tenant-a'),
+			).resolves.toEqual([]);
 
 			expect(await tableCount(databases, 'parties')).toBe(0);
 			expect(await tableCount(databases, 'parties_history_v2')).toBe(0);
@@ -291,9 +292,9 @@ describe('party target idempotency', () => {
 				context('party-corrupt-key-1'),
 			),
 		).rejects.toMatchObject({ code: 'PARTY_IDEMPOTENCY_LEDGER_CORRUPT' });
-		await expect((await recovered.service()).list('tenant-a')).resolves.toEqual(
-			[],
-		);
+		await expect(
+			listAll(await recovered.service(), 'tenant-a'),
+		).resolves.toEqual([]);
 		expect(
 			await partiesAgentTools(recovered)[2]!.execute(
 				input,

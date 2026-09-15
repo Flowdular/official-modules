@@ -1,5 +1,8 @@
 import type { DatabaseMigration } from '@flowdular/sdk/database';
-import { postgresTenantTableState } from '@flowdular/sdk/database';
+import {
+	migrationObjectState,
+	postgresTenantTableState,
+} from '@flowdular/sdk/database';
 
 /* Every constant mirrors its migrations/<id>.up.sql file byte for byte;
    tests/migrations.test.ts fails on drift. */
@@ -61,6 +64,17 @@ export const EXPENSES_MIGRATION_003_NOTE_TEMPLATE = `ALTER TABLE expenses_claims
   ADD COLUMN IF NOT EXISTS note_template TEXT CHECK (note_template IS NULL OR length(note_template) BETWEEN 1 AND 2000);
 `;
 
+export const EXPENSES_MIGRATION_004_LIST_INDEXES = `-- The claims list pages by keyset over (sort column, id) under one tenant, and
+-- an approver's page joins their own claims with every submitted one, so each
+-- sort key gets a tenant-first index that carries the id as its tie-breaker.
+CREATE INDEX IF NOT EXISTS expenses_claims_tenant_created_idx
+  ON expenses_claims (tenant_id, created_at, id);
+CREATE INDEX IF NOT EXISTS expenses_claims_tenant_amount_idx
+  ON expenses_claims (tenant_id, amount_minor, id);
+CREATE INDEX IF NOT EXISTS expenses_claims_tenant_expense_date_idx
+  ON expenses_claims (tenant_id, expense_date, id);
+`;
+
 export const databaseMigrations: readonly DatabaseMigration[] = [
 	{
 		id: '0001_expenses_core',
@@ -107,5 +121,16 @@ export const databaseMigrations: readonly DatabaseMigration[] = [
 			(await database.schema.hasColumn('expenses_claims', 'note_template'))
 				? 'complete'
 				: 'absent',
+	},
+	{
+		id: '0004_expenses_list_indexes',
+		sql: { postgresql: EXPENSES_MIGRATION_004_LIST_INDEXES },
+		inspectExisting: (database) =>
+			migrationObjectState([
+				() => database.schema.hasIndex('expenses_claims_tenant_created_idx'),
+				() => database.schema.hasIndex('expenses_claims_tenant_amount_idx'),
+				() =>
+					database.schema.hasIndex('expenses_claims_tenant_expense_date_idx'),
+			]),
 	},
 ];
