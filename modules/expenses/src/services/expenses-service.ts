@@ -10,19 +10,68 @@ import {
 } from '@flowdular/sdk/kernel';
 import {
 	EXPENSE_CLAIM_CATEGORIES,
+	EXPENSE_CLAIM_LIMITS,
+	EXPENSE_CLAIM_SORTS,
 	EXPENSE_CLAIM_STATUSES,
 	type CreateExpensesClaimInput,
+	type ExpenseClaimBulkOutcome,
 	type ExpenseClaimCategory,
 	type ExpenseClaimDecision,
+	type ExpenseClaimSort,
+	type ExpenseClaimSortDirection,
 	type ExpenseClaimStatus,
 	type ExpensesClaim,
 	type UpdateExpensesClaimInput,
 } from '../domain/types.ts';
 import { EXPENSE_NOTE_VARIABLES } from '../domain/variables.ts';
-import type { ExpensesExportCursor, ExpensesRepository } from './repository.ts';
+import type {
+	ExpenseClaimKeyset,
+	ExpensesExportCursor,
+	ExpensesRepository,
+} from './repository.ts';
 
 /** Rows one export query holds, so a long history costs bounded memory. */
 export const EXPORT_PAGE = 500;
+
+/** The comment a bulk decision records when the reviewer left it blank. */
+export const BULK_DECISION_COMMENTS: Readonly<
+	Record<ExpenseClaimDecision, string>
+> = {
+	approved: 'Approved in bulk review.',
+	rejected: 'Rejected in bulk review.',
+};
+
+/** The filters, order and window of one claims page, before the keyset. */
+export interface ExpenseClaimPageInput {
+	readonly status: ExpenseClaimStatus | null;
+	readonly category: ExpenseClaimCategory | null;
+	readonly search: string;
+	readonly sort: ExpenseClaimSort;
+	readonly direction: ExpenseClaimSortDirection;
+	readonly limit: number;
+	readonly after: ExpenseClaimKeyset | null;
+}
+
+export interface ExpenseClaimPage {
+	readonly items: readonly ExpensesClaim[];
+	/** The keyset of the last row when the page was full; null otherwise. */
+	readonly next: ExpenseClaimKeyset | null;
+}
+
+/** The keyset value a claim contributes under one sort. */
+export function claimSortValue(
+	claim: ExpensesClaim,
+	sort: ExpenseClaimSort,
+): string | number {
+	switch (sort) {
+		case 'amount':
+			return claim.amountMinor;
+		case 'expenseDate':
+			return claim.expenseDate;
+		default:
+			return claim.createdAt;
+	}
+}
 
 export class ExpensesServiceError extends Error {
 	constructor(
@@ -186,27 +235,81 @@ function trustedActor(actor: Actor): Actor {
 export class ExpensesService {
 	constructor(private readonly repository: ExpensesRepository) {}
 
-	async list(
+	async page(
 		tenantId: string,
 		claimantId: string,
-		status: ExpenseClaimStatus | null,
 		includeApprovalQueue: boolean,
-	): Promise<readonly ExpensesClaim[]> {
+		input: ExpenseClaimPageInput,
+	): Promise<ExpenseClaimPage> {
 		if (
-			status !== null &&
-			!(EXPENSE_CLAIM_STATUSES as readonly string[]).includes(status)
+			input.status !== null &&
+			!(EXPENSE_CLAIM_STATUSES as readonly string[]).includes(input.status)
 		) {
 			throw new ExpensesServiceError(
 				'INVALID_CLAIM_STATUS',
 				'status must be draft, submitted, approved, or rejected.',
 			);
 		}
-		return await this.repository.list({
+		if (
+			input.category !== null &&
+			!(EXPENSE_CLAIM_CATEGORIES as readonly string[]).includes(input.category)
+		) {
+			throw new ExpensesServiceError(
+				'INVALID_CLAIM_CATEGORY',
+				'category must be travel, meals, equipment, or other.',
+			);
+		}
+		if (!(EXPENSE_CLAIM_SORTS as readonly string[]).includes(input.sort)) {
+			throw new ExpensesServiceError(
+				'INVALID_INPUT',
+				`sort must be one of ${EXPENSE_CLAIM_SORTS.join(', ')}.`,
+			);
+		}
+		if (input.direction !== 'asc' && input.direction !== 'desc') {
+			throw new ExpensesServiceError(
+				'INVALID_INPUT',
+				'direction must be asc or desc.',
+			);
+		}
+		if (
+			!Number.isSafeInteger(input.limit) ||
+			input.limit < 1 ||
+			input.limit > EXPENSE_CLAIM_LIMITS.page
+		) {
+			throw new ExpensesServiceError(
+				'INVALID_INPUT',
+				`limit must be an integer between 1 and ${EXPENSE_CLAIM_LIMITS.page}.`,
+			);
+		}
+		const search = input.search.trim();
+		if (search.length > EXPENSE_CLAIM_LIMITS.search) {
+			throw new ExpensesServiceError(
+				'INVALID_INPUT',
+				`q must contain at most ${EXPENSE_CLAIM_LIMITS.search} characters.`,
+			);
+		}
+		const items = await this.repository.page({
 			tenantId: identifier(tenantId, 'tenantId'),
 			claimantId: identifier(claimantId, 'claimantId'),
-			status,
 			includeApprovalQueue,
+			status: input.status,
+			category: input.category,
+			search: search === '' ? null : search,
+			sort: input.sort,
+			direction: input.direction,
+			limit: input.limit,
+			after: input.after,
 		});
+		const last = items[items.length - 1];
+		return {
+			items,
+			/* A full page may still be the last one; the client stops when the
+			   cursor stops, which costs one empty page at most. */
+			next:
+				last && items.length === input.limit
+					? { sortValue: claimSortValue(last, input.sort), id: last.id }
+					: null,
+		};
 	}
 
 	async create(
@@ -315,6 +418,36 @@ export class ExpensesService {
 		);
 	}
 
+	/* Each id runs the single decision path, so every row keeps its own history
+	   version and a refused or missing id costs no other row. A blank comment
+	   records the bulk default, because a decision never stores an empty one. */
+	decideMany(
+		tenantId: string,
+		claimIds: readonly string[],
+		decision: ExpenseClaimDecision,
+		comment: string | null,
+		actor: Actor,
+	): Promise<readonly ExpenseClaimBulkOutcome[]> {
+		const recorded =
+			comment === null || comment.trim() === ''
+				? BULK_DECISION_COMMENTS[decision]
+				: comment;
+		return this.each(claimIds, (claimId) =>
+			this.decide(tenantId, claimId, decision, recorded, actor),
+		);
+	}
+
+	submitMany(
+		tenantId: string,
+		claimantId: string,
+		claimIds: readonly string[],
+		actor: Actor,
+	): Promise<readonly ExpenseClaimBulkOutcome[]> {
+		return this.each(claimIds, (claimId) =>
+			this.submit(tenantId, claimantId, claimId, actor),
+		);
+	}
+
 	/* A claim nobody may read has no readable history: without the approval
 	   permission only the claimant's own claims answer. */
 	async history(
@@ -400,6 +533,33 @@ export class ExpensesService {
 				occurredAt: new Date(entry.occurredAt).toISOString(),
 			}),
 		);
+	}
+
+	private async each(
+		claimIds: readonly string[],
+		write: (claimId: string) => Promise<unknown>,
+	): Promise<readonly ExpenseClaimBulkOutcome[]> {
+		if (claimIds.length < 1 || claimIds.length > EXPENSE_CLAIM_LIMITS.bulk) {
+			throw new ExpensesServiceError(
+				'INVALID_INPUT',
+				`claimIds must name between 1 and ${EXPENSE_CLAIM_LIMITS.bulk} claims.`,
+			);
+		}
+		const outcomes: ExpenseClaimBulkOutcome[] = [];
+		for (const id of claimIds) {
+			try {
+				await write(id);
+				outcomes.push({ id, outcome: 'updated' });
+			} catch (error) {
+				if (!(error instanceof ExpensesServiceError)) throw error;
+				outcomes.push(
+					error.code === 'CLAIM_NOT_FOUND'
+						? { id, outcome: 'not-found' }
+						: { id, outcome: 'refused', reason: error.code },
+				);
+			}
+		}
+		return outcomes;
 	}
 
 	private async claim(

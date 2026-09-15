@@ -51,3 +51,28 @@ export interface CreateExpensesClaimInput {
 }
 
 export type UpdateExpensesClaimInput = CreateExpensesClaimInput;
+
+export const EXPENSE_CLAIM_SORTS = [
+	'createdAt',
+	'amount',
+	'expenseDate',
+] as const;
+export type ExpenseClaimSort = (typeof EXPENSE_CLAIM_SORTS)[number];
+export type ExpenseClaimSortDirection = 'asc' | 'desc';
+
+export const EXPENSE_CLAIM_LIMITS = {
+	/** Ids one bulk claim action may name. */
+	bulk: 100,
+	/** Characters of a title search term. */
+	search: 120,
+	page: 200,
+	defaultPage: 50,
+} as const;
+
+/** What one id in a bulk action came to: the single route's answer per row. */
+export interface ExpenseClaimBulkOutcome {
+	readonly id: string;
+	readonly outcome: 'updated' | 'not-found' | 'refused';
+	/** The stable service code behind a refusal. */
+	readonly reason?: string;
+}

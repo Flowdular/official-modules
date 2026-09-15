@@ -1,6 +1,6 @@
 schemaVersion: 1
 id: parties.core
-specVersion: 0.9.2
+specVersion: 0.10.0
 status: approved
 name: Business Parties Core
 description: Provides the tenant-scoped customer and supplier master data used by commercial ERP modules.
@@ -15,6 +15,11 @@ dependencies:
     range: ^0.7.0
   - id: auth.core
     range: ^0.13.0
+  - id: exports.core
+    range: ^0.2.0
+requires:
+  - id: exports.lists.v1
+    optional: true
 tenancy: required
 locales:
   - en
@@ -31,6 +36,9 @@ invariants:
   - One tenant-scoped durable target ledger is shared by mutating agent tools and workflow actions; each entry binds an idempotency key to the exact tool identifier or versioned workflow action identifier, canonical input digest, and first persisted result in the same transaction as the party mutation.
   - Replaying the same idempotency key for the same operation and canonical input returns the original result without another party or history row, while reuse for another operation or input fails with a stable conflict.
   - Idempotency ledger entries remain after a party is deleted, and audit metadata records identifiers, input digests, and outcomes without raw tool input, credentials, secrets, or result payloads.
+  - The party list is read one keyset page at a time, never whole. A page is at most 200 rows (50 by default) in one of two orders, the lower-cased name or the last update time, each paired with the id and carried by its own index, and the kind, status, VAT presence and search filters are applied in SQL. The page cursor is signed with a module secret drawn at composition and binds the tenant, the sort, the direction and a digest of the filters, so a cursor presented under another tenant, order or filter set is refused with CURSOR_INVALID rather than spliced into another listing.
+  - The list export registered with exports.lists.v1 as parties.core.records declares the name, kind, VAT id, contact and status columns, is behind parties.records.read and walks the list endpoint's own default page under the principal that started the job, so a file can never carry a row of another tenant. A deployment without exports.core still composes parties.core and registers nothing.
+  - Archiving or reactivating a selection runs the single-row lifecycle path once per id, at most 100 unique ids per call, and answers one outcome per id (updated, not-found or refused with the reason code), so every row keeps its own history entry, a missing or foreign id refuses only itself, and the idempotency ledger is untouched because the interactive routes never write it.
   - The data class export of one tenant reads every row of that tenant and no other through the module's own tenant-scoped transaction. No data class carries a retention period, a sweep, or an erasure, because parties and their history leave only when a person deletes the party, and the idempotency ledger stays durable and is excluded from the export with a stated reason.
 permissions:
   - id: parties.records.read
@@ -45,8 +53,16 @@ dataOwnership:
 acceptanceScenarios:
   - id: PARTIES-LIST
     given: Tenant-scoped customer and supplier records exist.
-    when: An authorized principal lists parties.
-    then: Only records owned by the active tenant are returned in deterministic name order.
+    when: An authorized principal lists parties page by page, sorted by name or last update, filtered by kind, status, VAT presence or a search term.
+    then: Only records owned by the active tenant are returned, two consecutive pages neither overlap nor skip a row, a full page carries a cursor and a short page none, and a tampered, foreign-tenant or refiltered cursor or an unknown sort answers 400.
+  - id: PARTIES-EXPORT-LIST
+    given: exports.core composed and registered its list capability.
+    when: parties.core composes and a principal with parties.records.read starts an export of parties.core.records.
+    then: The catalogue lists parties.core.records and the job streams every party of the principal's tenant with the declared columns.
+  - id: PARTIES-BULK-LIFECYCLE
+    given: An authorized principal selects parties on the Customers or Suppliers screen.
+    when: The principal confirms Archive selected or runs Reactivate selected, including a missing id and an id of another tenant.
+    then: Each id answers its own outcome, the archived or restored rows carry their own history entries, the untouched ids report not-found, and a body without 1 to 100 unique ids, without a CSRF token or without parties.records.manage is refused before any write.
   - id: PARTIES-CREATE
     given: An authorized principal supplies a valid name, kind, and optional contact fields.
     when: The party is created.

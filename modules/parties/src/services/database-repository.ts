@@ -17,6 +17,10 @@ import {
 } from '@flowdular/sdk/kernel';
 import type {
 	Party,
+	PartyListKeyset,
+	PartyListPage,
+	PartyListQuery,
+	PartyListSort,
 	PatchPartyInput,
 	UpdatePartyInput,
 } from '../domain/types.ts';
@@ -36,25 +40,58 @@ import {
 
 const HISTORY_TABLE = 'parties_history_v2';
 
-const COLUMNS = `id, tenant_id, name, kind, email, phone, vat_id, status, created_at`;
+const COLUMNS = `id, tenant_id, name, kind, email, phone, vat_id, status, created_at, updated_at`;
 
 /* Queries stay explicit. Party data never passes through a SQL rewriter, and
    values always use the adapter's parameter channel. */
-const LIST = `SELECT ${COLUMNS} FROM parties WHERE tenant_id = $1
-		 ORDER BY lower(name), id`;
-
 const FIND = `SELECT ${COLUMNS} FROM parties WHERE tenant_id = $1 AND id = $2`;
 
+const LIST_FILTERS = `tenant_id = $1
+		   AND ($2::text IS NULL OR kind = $2 OR kind = 'both')
+		   AND ($3::text IS NULL OR status = $3)
+		   AND ($4::text IS NULL OR name ILIKE $4 OR email ILIKE $4
+		        OR phone ILIKE $4 OR vat_id ILIKE $4)
+		   AND ($5::text IS NULL OR vat_id IS NOT NULL)`;
+
+/* One statement per order: the sort column, its type and the direction are
+   fixed here, never taken from a request. The keyset is the last row's sort
+   value and id, which parties_tenant_lower_name_idx and
+   parties_tenant_updated_at_idx carry. lower(name) is read back as name_key so
+   the cursor holds what PostgreSQL compared, not what JavaScript lowercased. */
+function pageStatement(sort: PartyListSort, direction: 'asc' | 'desc'): string {
+	const column = sort === 'name' ? 'lower(name)' : 'updated_at';
+	const type = sort === 'name' ? 'text' : 'bigint';
+	const comparison = direction === 'asc' ? '>' : '<';
+	const order = direction === 'asc' ? 'ASC' : 'DESC';
+	return `SELECT ${COLUMNS}, lower(name) AS name_key FROM parties
+		 WHERE ${LIST_FILTERS}
+		   AND ($6::${type} IS NULL OR (${column}, id) ${comparison} ($6::${type}, $7::text))
+		 ORDER BY ${column} ${order}, id ${order}
+		 LIMIT $8`;
+}
+
+const LIST_PAGE = {
+	name: {
+		asc: pageStatement('name', 'asc'),
+		desc: pageStatement('name', 'desc'),
+	},
+	updatedAt: {
+		asc: pageStatement('updatedAt', 'asc'),
+		desc: pageStatement('updatedAt', 'desc'),
+	},
+} as const;
+
 const INSERT = `INSERT INTO parties
-		 (id, tenant_id, name, kind, email, phone, vat_id, status, created_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
+		 (id, tenant_id, name, kind, email, phone, vat_id, status, created_at, updated_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
 
 const UPDATE = `UPDATE parties
-		 SET name = $1, kind = $2, email = $3, phone = $4, vat_id = $5
+		 SET name = $1, kind = $2, email = $3, phone = $4, vat_id = $5, updated_at = $8
 		 WHERE tenant_id = $6 AND id = $7
 		 RETURNING ${COLUMNS}`;
 
-const SET_STATUS = `UPDATE parties SET status = $1 WHERE tenant_id = $2 AND id = $3
+const SET_STATUS = `UPDATE parties SET status = $1, updated_at = $4
+		 WHERE tenant_id = $2 AND id = $3
 		 RETURNING ${COLUMNS}`;
 
 const DELETE = 'DELETE FROM parties WHERE tenant_id = $1 AND id = $2';
@@ -94,6 +131,11 @@ interface PartyRow {
 	vat_id: string | null;
 	status: Party['status'];
 	created_at: number | bigint | string;
+	updated_at: number | bigint | string;
+}
+
+interface PartyPageRow extends PartyRow {
+	name_key: string;
 }
 
 interface IdempotencyRow {
@@ -138,7 +180,14 @@ function fromRow(row: PartyRow): Party {
 		vatId: row.vat_id,
 		status: row.status,
 		createdAt: integer(row.created_at),
+		updatedAt: integer(row.updated_at),
 	};
+}
+
+/* The pattern is bound, so only the wildcards of ILIKE need escaping. */
+function containsPattern(search: string): string | null {
+	if (search === '') return null;
+	return '%' + search.replace(/[\\%_]/g, (char) => '\\' + char) + '%';
 }
 
 /* The fields a history version reports on. Identity, tenancy, and creation
@@ -167,17 +216,55 @@ export class DatabasePartyRepository implements PartyRepository {
 		private readonly readyPromise: Promise<void> = Promise.resolve(),
 	) {}
 
-	async list(tenantId: string): Promise<readonly Party[]> {
+	/* Reads one row past the page so a full page knows whether anything
+	   follows it without a second statement. */
+	async list(
+		tenantId: string,
+		query: PartyListQuery,
+		after: PartyListKeyset | null,
+		limit: number,
+	): Promise<PartyListPage> {
 		await this.readyPromise;
 		const result = await this.database.transaction(
 			(transaction) =>
-				transaction.query<PartyRow>({
-					text: LIST,
-					parameters: [tenantId],
+				transaction.query<PartyPageRow>({
+					text: LIST_PAGE[query.sort][query.direction],
+					parameters: [
+						tenantId,
+						query.kind,
+						query.status,
+						containsPattern(query.search),
+						query.hasVatId ? 'only' : null,
+						after?.sortValue ?? null,
+						after?.id ?? null,
+						limit + 1,
+					],
 				}),
 			{ access: 'read', tenantId },
 		);
-		return result.rows.map(fromRow);
+		const rows = result.rows.slice(0, limit);
+		const last = rows[rows.length - 1];
+		return {
+			parties: rows.map(fromRow),
+			next:
+				last && result.rows.length > limit
+					? {
+							sortValue:
+								query.sort === 'name'
+									? last.name_key
+									: integer(last.updated_at),
+							id: last.id,
+						}
+					: null,
+		};
+	}
+
+	async find(tenantId: string, id: string): Promise<Party | null> {
+		await this.readyPromise;
+		return this.database.transaction(
+			(transaction) => this.#find(transaction, tenantId, id),
+			{ access: 'read', tenantId },
+		);
 	}
 
 	async create(party: Party, actor: Actor): Promise<Party> {
@@ -251,6 +338,7 @@ export class DatabasePartyRepository implements PartyRepository {
 						input.vatId ?? null,
 						tenantId,
 						input.id,
+						Date.now(),
 					],
 				});
 				const row = result.rows[0];
@@ -315,6 +403,7 @@ export class DatabasePartyRepository implements PartyRepository {
 						next.vatId,
 						tenantId,
 						input.id,
+						Date.now(),
 					],
 				});
 				const after = fromRow(result.rows[0]!);
@@ -358,23 +447,22 @@ export class DatabasePartyRepository implements PartyRepository {
 			async (transaction) => {
 				const before = await this.#find(transaction, tenantId, id);
 				if (!before) return null;
+				if (before.status === status) return before;
 				const result = await transaction.query<PartyRow>({
 					text: SET_STATUS,
-					parameters: [status, tenantId, id],
+					parameters: [status, tenantId, id, Date.now()],
 				});
 				const row = result.rows[0];
 				if (!row) return null;
 				const after = fromRow(row);
-				if (before.status !== after.status) {
-					await appendRecordHistory(transaction, HISTORY_TABLE, {
-						tenantId,
-						recordId: id,
-						action: status === 'archived' ? 'archived' : 'restored',
-						actor,
-						changes: diffFields(tracked(before), tracked(after)),
-						occurredAt: Date.now(),
-					});
-				}
+				await appendRecordHistory(transaction, HISTORY_TABLE, {
+					tenantId,
+					recordId: id,
+					action: status === 'archived' ? 'archived' : 'restored',
+					actor,
+					changes: diffFields(tracked(before), tracked(after)),
+					occurredAt: Date.now(),
+				});
 				return after;
 			},
 			{ access: 'write', tenantId },
@@ -496,6 +584,7 @@ export class DatabasePartyRepository implements PartyRepository {
 				party.vatId,
 				party.status,
 				party.createdAt,
+				party.updatedAt,
 			],
 		});
 		await appendRecordHistory(transaction, HISTORY_TABLE, {

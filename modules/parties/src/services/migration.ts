@@ -1,5 +1,8 @@
 import type { DatabaseMigration } from '@flowdular/sdk/database';
-import { postgresTenantTableState } from '@flowdular/sdk/database';
+import {
+	migrationObjectState,
+	postgresTenantTableState,
+} from '@flowdular/sdk/database';
 
 /* Every constant mirrors its migrations/<id>.up.sql file byte for byte;
    tests/migrations.test.ts fails on drift. */
@@ -113,6 +116,19 @@ CREATE POLICY parties_idempotency_ledger_tenant_policy ON parties_idempotency_le
   WITH CHECK (tenant_id = current_setting('coreloom.tenant_id', true));
 `;
 
+export const PARTIES_MIGRATION_006_LIST_ORDER = `ALTER TABLE parties ADD COLUMN IF NOT EXISTS updated_at BIGINT;
+-- The backfill runs as the migrator, which forced row security keeps out of
+-- every row without a tenant setting; lift the flag for the statement only.
+ALTER TABLE parties NO FORCE ROW LEVEL SECURITY;
+UPDATE parties SET updated_at = created_at WHERE updated_at IS NULL;
+ALTER TABLE parties FORCE ROW LEVEL SECURITY;
+ALTER TABLE parties ALTER COLUMN updated_at SET NOT NULL;
+CREATE INDEX IF NOT EXISTS parties_tenant_lower_name_idx
+  ON parties (tenant_id, lower(name), id);
+CREATE INDEX IF NOT EXISTS parties_tenant_updated_at_idx
+  ON parties (tenant_id, updated_at, id);
+`;
+
 export const databaseMigrations: readonly DatabaseMigration[] = [
 	{
 		id: '0001_parties_core',
@@ -177,5 +193,16 @@ export const databaseMigrations: readonly DatabaseMigration[] = [
 						),
 				],
 			),
+	},
+	{
+		id: '0006_parties_list_order',
+		sql: { postgresql: PARTIES_MIGRATION_006_LIST_ORDER },
+		/* The table is 0001's; this migration owns one column and two indexes. */
+		inspectExisting: (database) =>
+			migrationObjectState([
+				() => database.schema.hasColumn('parties', 'updated_at'),
+				() => database.schema.hasIndex('parties_tenant_lower_name_idx'),
+				() => database.schema.hasIndex('parties_tenant_updated_at_idx'),
+			]),
 	},
 ];

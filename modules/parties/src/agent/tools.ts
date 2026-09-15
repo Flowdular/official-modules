@@ -8,7 +8,10 @@ import { agentActor, type Actor } from '@flowdular/sdk/kernel';
 import { PARTY_PERMISSIONS } from '../acl/permissions.ts';
 import type { PartyKind, PatchPartyInput } from '../domain/types.ts';
 import type { PartiesRuntime } from '../server/runtime.ts';
-import { PartyServiceError } from '../services/parties-service.ts';
+import {
+	DEFAULT_PARTY_LIST_QUERY,
+	PartyServiceError,
+} from '../services/parties-service.ts';
 
 const MAX_TOOL_ROWS = 200;
 const CREATE_OPERATION = 'parties.customer.create@1';
@@ -37,6 +40,9 @@ const PARTY_OUTPUT_SCHEMA = {
 		vatId: { type: ['string', 'null'] },
 		status: { type: 'string', enum: ['active', 'archived'] },
 		createdAt: { type: 'integer' },
+		/* Optional: a result replayed from a ledger entry written before the
+		   column existed carries none. */
+		updatedAt: { type: 'integer' },
 	},
 } as const;
 
@@ -95,19 +101,18 @@ export function partiesAgentTools(
 				context.signal.throwIfAborted();
 				const value = (input ?? {}) as Record<string, unknown>;
 				const status = text(value.status);
-				const query = normalized(value.query);
-				return (await (await runtime.service()).list(context.tenantId))
-					.filter(
-						(party) =>
-							(status === null || party.status === status) &&
-							(query === '' ||
-								party.name.toLocaleLowerCase('en-US').includes(query) ||
-								(party.email ?? '')
-									.toLocaleLowerCase('en-US')
-									.includes(query) ||
-								(party.vatId ?? '').toLocaleLowerCase('en-US').includes(query)),
-					)
-					.slice(0, MAX_TOOL_ROWS);
+				return (
+					await (
+						await runtime.service()
+					).list(context.tenantId, {
+						...DEFAULT_PARTY_LIST_QUERY,
+						status:
+							status === 'archived' || status === 'active' ? status : null,
+						search: normalized(value.query),
+						limit: MAX_TOOL_ROWS,
+						after: null,
+					})
+				).parties;
 			},
 		}),
 		defineApiAgentTool({

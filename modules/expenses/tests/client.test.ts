@@ -14,6 +14,19 @@ import {
 	formatExpenseAmount,
 	showsExpenseActionColumn,
 } from '../src/client/expense-claims.ts';
+import {
+	bulkOutcomeCounts,
+	claimSort,
+	DEFAULT_CLAIM_SORTING,
+	decidableTargets,
+	loadedListing,
+	pageCursor,
+	rememberNextCursor,
+	resetPageCursors,
+	searchPending,
+	submittableTargets,
+} from '../src/client/state.ts';
+import type { ExpensesClaim } from '../src/domain/types.ts';
 import { EXPENSE_NOTE_VARIABLES } from '../src/domain/variables.ts';
 
 describe('expense claim client helpers', () => {
@@ -145,5 +158,96 @@ describe('expense claim client helpers', () => {
 		expect(showsExpenseActionColumn(true, false)).toBe(true);
 		expect(showsExpenseActionColumn(false, true)).toBe(true);
 		expect(showsExpenseActionColumn(true, true)).toBe(true);
+	});
+});
+
+describe('expense claims listing state', () => {
+	it('walks the cursor stack forward, back and resets it on a new listing', () => {
+		let cursors = resetPageCursors();
+		expect(pageCursor(cursors, 0)).toBeNull();
+		expect(pageCursor(cursors, 1)).toBeUndefined();
+		cursors = rememberNextCursor(cursors, 0, 'c1');
+		expect(pageCursor(cursors, 1)).toBe('c1');
+		cursors = rememberNextCursor(cursors, 1, 'c2');
+		expect(cursors).toEqual([null, 'c1', 'c2']);
+		/* Going back re-reads page 0 and drops what lay beyond page 1. */
+		cursors = rememberNextCursor(cursors, 0, 'c1b');
+		expect(cursors).toEqual([null, 'c1b']);
+		cursors = rememberNextCursor(cursors, 1, null);
+		expect(cursors).toEqual([null, 'c1b']);
+		expect(pageCursor(cursors, 2)).toBeUndefined();
+		expect(resetPageCursors()).toEqual([null]);
+	});
+
+	it('maps the table sorting to the server sort and direction', () => {
+		expect(claimSort([])).toEqual({ sort: 'createdAt', direction: 'desc' });
+		expect(claimSort([{ key: 'amount', desc: false }])).toEqual({
+			sort: 'amount',
+			direction: 'asc',
+		});
+		expect(claimSort([{ key: 'expenseDate', desc: true }])).toEqual({
+			sort: 'expenseDate',
+			direction: 'desc',
+		});
+		expect(claimSort([{ key: 'claim', desc: false }]).sort).toBe('createdAt');
+	});
+
+	it('empties the selection with every loaded listing and keeps the page cursors', () => {
+		const loaded = loadedListing(
+			{
+				pageIndex: 1,
+				pageSize: 25,
+				sorting: DEFAULT_CLAIM_SORTING,
+				query: 'train',
+				status: 'all',
+				category: 'all',
+				cursors: [null, 'c1'],
+			},
+			{ items: [], page: { nextCursor: 'c2', limit: 25 } },
+		);
+		expect(loaded.cursors).toEqual([null, 'c1', 'c2']);
+		expect(loaded.appliedQuery).toBe('train');
+		expect(loaded.selectedIds.size).toBe(0);
+		expect(searchPending(' train ', 'train')).toBe(false);
+		expect(searchPending('trai', 'train')).toBe(true);
+	});
+
+	it('names only decidable or submittable selected rows and counts outcomes', () => {
+		const claim = (
+			id: string,
+			status: ExpensesClaim['status'],
+		): ExpensesClaim => ({
+			id,
+			tenantId: 't',
+			claimantId: 'a',
+			title: id,
+			name: id,
+			amountMinor: 1,
+			currency: 'EUR',
+			category: 'travel',
+			expenseDate: '2026-08-20',
+			note: null,
+			noteTemplate: null,
+			status,
+			decisionComment: null,
+			createdAt: 1,
+		});
+		const claims = [
+			claim('s1', 'submitted'),
+			claim('d1', 'draft'),
+			claim('a1', 'approved'),
+			claim('s2', 'submitted'),
+		];
+		const selected = new Set(['s1', 'd1', 'a1', 'gone']);
+		expect(decidableTargets(claims, selected)).toEqual(['s1']);
+		expect(submittableTargets(claims, selected)).toEqual(['d1']);
+		expect(
+			bulkOutcomeCounts([
+				{ id: 's1', outcome: 'updated' },
+				{ id: 'gone', outcome: 'not-found' },
+				{ id: 'a1', outcome: 'refused', reason: 'CLAIM_NOT_SUBMITTED' },
+				{ id: 's2', outcome: 'updated' },
+			]),
+		).toEqual({ updated: 2, missing: 1, refused: 1 });
 	});
 });

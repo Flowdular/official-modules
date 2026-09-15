@@ -5,6 +5,7 @@ import type {
 import { activeLocale, t } from '@flowdular/sdk/client/i18n';
 
 export type ExpenseStatusFilter = 'all' | ExpenseClaimStatus;
+export type ExpenseCategoryFilter = 'all' | ExpenseClaimCategory;
 export type ExpenseStatusTone = 'neutral' | 'success' | 'warning' | 'danger';
 
 export function amountToMinorUnits(value: string): number | null {

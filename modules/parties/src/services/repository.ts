@@ -1,6 +1,9 @@
 import type { Actor, HistoryPage, HistoryQuery } from '@flowdular/sdk/kernel';
 import type {
 	Party,
+	PartyListKeyset,
+	PartyListPage,
+	PartyListQuery,
 	PatchPartyInput,
 	UpdatePartyInput,
 } from '../domain/types.ts';
@@ -28,7 +31,14 @@ export interface PartyHistoryExportRow {
 
 /** The database-agnostic business port. No driver type crosses it. */
 export interface PartyRepository {
-	list(tenantId: string): Promise<readonly Party[]>;
+	/** One keyset page in the query's order; `after` is the keyset the previous page answered. */
+	list(
+		tenantId: string,
+		query: PartyListQuery,
+		after: PartyListKeyset | null,
+		limit: number,
+	): Promise<PartyListPage>;
+	find(tenantId: string, id: string): Promise<Party | null>;
 	create(party: Party, actor: Actor): Promise<Party>;
 	createIdempotent(
 		party: Party,
