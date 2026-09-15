@@ -12,11 +12,11 @@ importers:
         specifier: 0.3.120
         version: 0.3.120(prettier@3.6.2)
       create-flowdular:
-        specifier: 0.3.1
-        version: 0.3.1
+        specifier: 0.3.2
+        version: 0.3.2
       flowdular:
-        specifier: 0.3.1
-        version: 0.3.1(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3)
+        specifier: 0.3.2
+        version: 0.3.2(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3)
       prettier:
         specifier: 3.6.2
         version: 3.6.2
@@ -27,8 +27,8 @@ importers:
   modules/catalog:
     dependencies:
       '@flowdular/sdk':
-        specifier: 0.3.1
-        version: 0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
+        specifier: 0.3.2
+        version: 0.3.2(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
       octane:
         specifier: 0.1.51
         version: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
@@ -52,8 +52,8 @@ importers:
   modules/expenses:
     dependencies:
       '@flowdular/sdk':
-        specifier: 0.3.1
-        version: 0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
+        specifier: 0.3.2
+        version: 0.3.2(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
       octane:
         specifier: 0.1.51
         version: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
@@ -77,8 +77,8 @@ importers:
   modules/parties:
     dependencies:
       '@flowdular/sdk':
-        specifier: 0.3.1
-        version: 0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
+        specifier: 0.3.2
+        version: 0.3.2(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
       octane:
         specifier: 0.1.51
         version: 0.1.51(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))
@@ -102,8 +102,8 @@ importers:
   platform:
     dependencies:
       '@flowdular/sdk':
-        specifier: 0.3.1
-        version: 0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
+        specifier: 0.3.2
+        version: 0.3.2(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
 
   tests/consumer:
     dependencies:
@@ -114,8 +114,8 @@ importers:
         specifier: workspace:*
         version: link:../../modules/parties
       '@flowdular/sdk':
-        specifier: 0.3.1
-        version: 0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
+        specifier: 0.3.2
+        version: 0.3.2(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)
     devDependencies:
       '@tsrx/typescript-plugin':
         specifier: 0.3.120
@@ -340,8 +340,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@flowdular/sdk@0.3.1':
-    resolution: {integrity: sha512-yfeq6sMfWGZ83bUlHj/m0QjcjlS7zIXTO6QwWgudQ7bSv5g3kWQ/Cxs68a90pXdQ7uyrh3KWVayGTYur8GnzmA==}
+  '@flowdular/sdk@0.3.2':
+    resolution: {integrity: sha512-ks8+bbwR8B7lNYXEb0u0U4Tv+n6Wt6eD6Eh4sSfMRnl7f1/+GSLJuDPg+4tRMUU8ozZur46OyRvUmGduD5HsxQ==}
     engines: {node: '>=22.22.2'}
 
   '@fontsource-variable/ibm-plex-sans@5.3.0':
@@ -1367,8 +1367,8 @@ packages:
     resolution: {integrity: sha512-tJtZBBHA6vjIAaF6EnIaq6laBBP9aq/Y3ouVJjEfoHbRBcHBAHYcMh/w8LDrk2PvIMMq8gmopa5D4V8RmbrxGw==}
     engines: {node: '>= 0.10'}
 
-  create-flowdular@0.3.1:
-    resolution: {integrity: sha512-TcLjlIPv4LKOmRZ+VTCAlEkgisdGKLV0SbxAYWhBfwQJPH8QVwoSDA+rQ2RX+vBW/n7DZTeQdnivMj3+OPkiaA==}
+  create-flowdular@0.3.2:
+    resolution: {integrity: sha512-KtDybTQGPgh2jJcwwbvI2K/utJAtUCTeYGxoU2ly81VaM6u0tOXH2wTJuNx+StAoFhURNf84fD+W4Tyj4P+yMQ==}
     engines: {node: '>=22.22.2'}
     hasBin: true
 
@@ -1590,8 +1590,8 @@ packages:
     resolution: {integrity: sha512-S8KoZgRZN+a5rNwqTxlZZePjT/4cnm0ROV70LedRHZ0p8u9fRID0hJUZQpkKLzro8LfmC8sx23bY6tVNxv8pQA==}
     engines: {node: '>= 18.0.0'}
 
-  flowdular@0.3.1:
-    resolution: {integrity: sha512-hfqsHTDiy7GeMEjCzcOZZBPDg8Hg2jM6uJr5zPBDDNt/m9ZvGl7i2nv9+VRjZPbQDDnmg7sgsASOKWU8hfo4BA==}
+  flowdular@0.3.2:
+    resolution: {integrity: sha512-3+EOe1fFjNmeiYhm6VEOoilUgJNkyhE6bujAZ4E4A2yqexnlq1qLyydR4NsJw2Uc+Ib+md0Yba69I0XDLB55YQ==}
     hasBin: true
 
   follow-redirects@1.16.0:
@@ -2789,7 +2789,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@flowdular/sdk@0.3.1(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)':
+  '@flowdular/sdk@0.3.2(typescript@5.9.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(yaml@2.9.0))(zod@4.5.4)':
     dependencies:
       '@ai-sdk/anthropic': 4.0.46(zod@4.5.4)
       '@ai-sdk/azure': 4.0.54(zod@4.5.4)
@@ -2823,7 +2823,7 @@ snapshots:
       - vite-plus
       - zod
 
-  '@flowdular/sdk@0.3.1(typescript@5.9.3)(zod@4.4.3)':
+  '@flowdular/sdk@0.3.2(typescript@5.9.3)(zod@4.4.3)':
     dependencies:
       '@ai-sdk/anthropic': 4.0.46(zod@4.4.3)
       '@ai-sdk/azure': 4.0.54(zod@4.4.3)
@@ -3698,7 +3698,7 @@ snapshots:
       object-assign: 4.1.1
       vary: 1.1.2
 
-  create-flowdular@0.3.1: {}
+  create-flowdular@0.3.2: {}
 
   cross-spawn@7.0.6:
     dependencies:
@@ -3972,10 +3972,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  flowdular@0.3.1(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3):
+  flowdular@0.3.2(@types/node@24.13.3)(typescript@5.9.3)(zod@4.4.3):
     dependencies:
       '@electric-sql/pglite': 0.5.8
-      '@flowdular/sdk': 0.3.1(typescript@5.9.3)(zod@4.4.3)
+      '@flowdular/sdk': 0.3.2(typescript@5.9.3)(zod@4.4.3)
       '@inquirer/prompts': 8.7.2(@types/node@24.13.3)
       ajv: 8.20.0
       pg: 8.23.0
