@@ -87,6 +87,57 @@
 			"manifest": {
 				"$schema": "../../packages/contracts/schemas/module.schema.json",
 				"schemaVersion": 1,
+				"id": "catalog.core",
+				"package": "@flowdular/module-catalog",
+				"version": "0.8.0",
+				"profile": "full",
+				"capabilities": [
+					"api",
+					"database",
+					"client",
+					"translations"
+				],
+				"platform": {
+					"server": true,
+					"client": true
+				},
+				"dependencies": [
+					{
+						"id": "system.core",
+						"range": "^0.7.0"
+					},
+					{
+						"id": "auth.core",
+						"range": "^0.13.0"
+					},
+					{
+						"id": "exports.core",
+						"range": "^0.2.0"
+					}
+				],
+				"requires": [
+					{
+						"id": "exports.lists.v1",
+						"optional": true
+					}
+				],
+				"tenancy": "required",
+				"locales": [
+					"en",
+					"pl"
+				],
+				"stability": "experimental",
+				"platformApi": "^0.1.0"
+			},
+			"artifact": "https://raw.githubusercontent.com/Flowdular/official-modules/31e02879059751065efc89c45e0c3987c5250523/registry/releases/catalog.core/0.8.0.json",
+			"sha256": "3e1c8530eed822c35e12f24545492bf7614bbd47e3a9255a869423d7e1662ef4",
+			"sourceCommit": "31e02879059751065efc89c45e0c3987c5250523",
+			"license": "MIT"
+		},
+		{
+			"manifest": {
+				"$schema": "../../packages/contracts/schemas/module.schema.json",
+				"schemaVersion": 1,
 				"id": "expenses.core",
 				"package": "@flowdular/module-expenses",
 				"version": "0.6.1",
@@ -163,6 +214,108 @@
 			"artifact": "https://raw.githubusercontent.com/Flowdular/official-modules/ba5c896c640740188fecd8318ab656f81fc4851d/registry/releases/expenses.core/0.7.2.json",
 			"sha256": "7dfeda0dd6067cef77b50996760db6b09f9d01cdb697989132f91566c24fc3d8",
 			"sourceCommit": "ba5c896c640740188fecd8318ab656f81fc4851d",
+			"license": "MIT"
+		},
+		{
+			"manifest": {
+				"$schema": "../../packages/contracts/schemas/module.schema.json",
+				"schemaVersion": 1,
+				"id": "expenses.core",
+				"package": "@flowdular/module-expenses",
+				"version": "0.8.0",
+				"profile": "full",
+				"capabilities": [
+					"api",
+					"database",
+					"client",
+					"translations"
+				],
+				"platform": {
+					"server": true,
+					"client": true
+				},
+				"dependencies": [
+					{
+						"id": "system.core",
+						"range": "^0.7.0"
+					},
+					{
+						"id": "auth.core",
+						"range": "^0.13.0"
+					},
+					{
+						"id": "exports.core",
+						"range": "^0.2.0"
+					}
+				],
+				"requires": [
+					{
+						"id": "exports.lists.v1",
+						"optional": true
+					}
+				],
+				"tenancy": "required",
+				"locales": [
+					"en",
+					"pl"
+				],
+				"stability": "experimental",
+				"platformApi": "^0.1.0"
+			},
+			"artifact": "https://raw.githubusercontent.com/Flowdular/official-modules/31e02879059751065efc89c45e0c3987c5250523/registry/releases/expenses.core/0.8.0.json",
+			"sha256": "d811afd5ebff1a848bc31fa58129bd319d09f59fbfa9c5e565c9b1a3411eb7af",
+			"sourceCommit": "31e02879059751065efc89c45e0c3987c5250523",
+			"license": "MIT"
+		},
+		{
+			"manifest": {
+				"$schema": "../../packages/contracts/schemas/module.schema.json",
+				"schemaVersion": 1,
+				"id": "parties.core",
+				"package": "@flowdular/module-parties",
+				"version": "0.10.0",
+				"profile": "full",
+				"capabilities": [
+					"api",
+					"database",
+					"client",
+					"translations"
+				],
+				"platform": {
+					"server": true,
+					"client": true
+				},
+				"dependencies": [
+					{
+						"id": "system.core",
+						"range": "^0.7.0"
+					},
+					{
+						"id": "auth.core",
+						"range": "^0.13.0"
+					},
+					{
+						"id": "exports.core",
+						"range": "^0.2.0"
+					}
+				],
+				"requires": [
+					{
+						"id": "exports.lists.v1",
+						"optional": true
+					}
+				],
+				"tenancy": "required",
+				"locales": [
+					"en",
+					"pl"
+				],
+				"stability": "experimental",
+				"platformApi": "^0.1.0"
+			},
+			"artifact": "https://raw.githubusercontent.com/Flowdular/official-modules/31e02879059751065efc89c45e0c3987c5250523/registry/releases/parties.core/0.10.0.json",
+			"sha256": "8c4c24d25374f44aa32018382b7d06d4a8da1b6a78bf1ef64420dc468c9ab826",
+			"sourceCommit": "31e02879059751065efc89c45e0c3987c5250523",
 			"license": "MIT"
 		},
 		{
