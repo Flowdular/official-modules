@@ -2,6 +2,12 @@ import { useEffect, useMemo } from 'octane';
 import {
 	Alert,
 	Button,
+	CellCode,
+	CellMuted,
+	CellStack,
+	CellTag,
+	CellText,
+	CellTime,
 	ConfirmDialog,
 	Drawer,
 	EmptyState,
@@ -13,7 +19,6 @@ import {
 	SearchField,
 	Select,
 	TableCard,
-	Tag,
 	ToastHost,
 	toasts,
 	type TableColumn,
@@ -78,13 +83,6 @@ function kindLabel(kind: PartyKind): string {
 	return t('parties.kind.' + kind);
 }
 
-function date(value: number): string {
-	return new Intl.DateTimeFormat(activeLocale(), {
-		dateStyle: 'medium',
-		timeStyle: 'short',
-	}).format(new Date(value));
-}
-
 /* Column keys double as the server's sort keys; only the two the server
    orders by declare a value, so only they get a sortable header. */
 function columns(): readonly TableColumn<Party>[] {
@@ -92,43 +90,49 @@ function columns(): readonly TableColumn<Party>[] {
 		{
 			key: 'name',
 			header: t('parties.table.column.party'),
-			width: '30%',
+			width: 'auto',
 			value: (party) => party.name,
-			cell: (party) => <span class="ui-cell">
-				<b>{party.name}</b>
-				<small>
-					{party.email ?? party.phone ?? t('parties.table.noContact')}
-				</small>
-			</span>,
+			cell: (party) =>
+				<CellStack
+					primary={party.name}
+					secondary={party.email ?? party.phone ??
+						<CellMuted>{t('parties.table.noContact')}</CellMuted>}
+				/>,
 		},
 		{
 			key: 'kind',
 			header: t('parties.table.column.kind'),
-			width: '16%',
-			cell: (party) => kindLabel(party.kind),
+			width: '140px',
+			priority: 2,
+			cell: (party) => <CellText value={kindLabel(party.kind)} />,
 		},
 		{
 			key: 'vatId',
 			header: t('parties.table.column.vatId'),
-			width: '18%',
-			cell: (party) =>
-				<span class="ui-mono">{party.vatId ?? t('parties.table.notSet')}</span>,
+			width: '170px',
+			priority: 2,
+			cell: (party) => party.vatId === null
+				? <CellMuted>{t('parties.table.notSet')}</CellMuted>
+				: <CellCode value={party.vatId} />,
 		},
 		{
 			key: 'status',
 			header: t('parties.table.column.status'),
-			width: '14%',
+			width: '130px',
 			cell: (party) =>
-				<Tag tone={party.status === 'active' ? 'success' : 'neutral'} dot>{t(
-					'parties.status.' + party.status,
-				)}</Tag>,
+				<CellTag
+					tone={party.status === 'active' ? 'success' : 'neutral'}
+					dot
+					label={t('parties.status.' + party.status)}
+				/>,
 		},
 		{
 			key: 'updatedAt',
 			header: t('parties.table.column.updatedAt'),
-			width: '18%',
+			width: '170px',
+			priority: 2,
 			value: (party) => party.updatedAt,
-			cell: (party) => date(party.updatedAt),
+			cell: (party) => <CellTime value={party.updatedAt} />,
 		},
 	];
 }

@@ -43,7 +43,7 @@ export function PartyForm(props: PartyFormProps) @{
 						value={name}
 						onInput={(event) => setName(event.currentTarget.value)}
 						minlength={2}
-						maxlength={160}
+						maxLength={160}
 						autoFocus
 						required
 					/>
@@ -71,7 +71,7 @@ export function PartyForm(props: PartyFormProps) @{
 							type="email"
 							value={email}
 							onInput={(event) => setEmail(event.currentTarget.value)}
-							maxlength={254}
+							maxLength={254}
 						/>
 					</FormField>
 					<FormField label={t('parties.form.phone')}>
@@ -81,7 +81,7 @@ export function PartyForm(props: PartyFormProps) @{
 							type="tel"
 							value={phone}
 							onInput={(event) => setPhone(event.currentTarget.value)}
-							maxlength={40}
+							maxLength={40}
 						/>
 					</FormField>
 				</div>
@@ -95,7 +95,7 @@ export function PartyForm(props: PartyFormProps) @{
 						value={vatId}
 						onInput={(event) => setVatId(event.currentTarget.value)}
 						pattern="[A-Za-z0-9]*"
-						maxlength={20}
+						maxLength={20}
 					/>
 				</FormField>
 				@if (props.error) {

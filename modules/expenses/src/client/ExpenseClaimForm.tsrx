@@ -34,7 +34,7 @@ export function ExpenseClaimForm(props: ExpenseClaimFormProps) @{
 						<input
 							class="ui-input"
 							name="title"
-							maxlength={160}
+							maxLength={160}
 							autoFocus
 							required
 						/>
@@ -64,18 +64,24 @@ export function ExpenseClaimForm(props: ExpenseClaimFormProps) @{
 								event.currentTarget.value.toUpperCase(),
 							)}
 							minlength={3}
-							maxlength={3}
+							maxLength={3}
 							required
 						/>
 					</FormField>
 					<FormField label={t('expenses.form.category')} required>
 						<select class="ui-select" name="category" required>
-							<option value="travel">{t('expenses.category.travel')}</option>
-							<option value="meals">{t('expenses.category.meals')}</option>
-							<option value="equipment">{t(
-								'expenses.category.equipment',
+							<option value="travel">{t(
+								'expenses.category.travel.label',
 							)}</option>
-							<option value="other">{t('expenses.category.other')}</option>
+							<option value="meals">{t(
+								'expenses.category.meals.label',
+							)}</option>
+							<option value="equipment">{t(
+								'expenses.category.equipment.label',
+							)}</option>
+							<option value="other">{t(
+								'expenses.category.other.label',
+							)}</option>
 						</select>
 					</FormField>
 				</div>
@@ -102,7 +108,7 @@ export function ExpenseClaimForm(props: ExpenseClaimFormProps) @{
 							'expense.title': t('expenses.template.sample.title'),
 							'expense.amount': '42.50',
 							'expense.currency': currency,
-							'expense.category': t('expenses.category.meals'),
+							'expense.category': t('expenses.category.meals.label'),
 							'expense.date': '2026-09-02',
 						}}
 						maxLength={2000}

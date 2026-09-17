@@ -189,6 +189,57 @@
 			"manifest": {
 				"$schema": "../../packages/contracts/schemas/module.schema.json",
 				"schemaVersion": 1,
+				"id": "catalog.core",
+				"package": "@flowdular/module-catalog",
+				"version": "0.8.2",
+				"profile": "full",
+				"capabilities": [
+					"api",
+					"database",
+					"client",
+					"translations"
+				],
+				"platform": {
+					"server": true,
+					"client": true
+				},
+				"dependencies": [
+					{
+						"id": "system.core",
+						"range": "^0.8.0"
+					},
+					{
+						"id": "auth.core",
+						"range": "^0.13.0"
+					},
+					{
+						"id": "exports.core",
+						"range": "^0.2.0"
+					}
+				],
+				"requires": [
+					{
+						"id": "exports.lists.v1",
+						"optional": true
+					}
+				],
+				"tenancy": "required",
+				"locales": [
+					"en",
+					"pl"
+				],
+				"stability": "experimental",
+				"platformApi": "^0.1.0"
+			},
+			"artifact": "https://raw.githubusercontent.com/Flowdular/official-modules/f38a67718c5a29aba5b5d37c0504430a3c7f565b/registry/releases/catalog.core/0.8.2.json",
+			"sha256": "149808831d620ac0ebc50abb6b0fb2caef6bec66b5d7821c752ec811e5d9219f",
+			"sourceCommit": "f38a67718c5a29aba5b5d37c0504430a3c7f565b",
+			"license": "MIT"
+		},
+		{
+			"manifest": {
+				"$schema": "../../packages/contracts/schemas/module.schema.json",
+				"schemaVersion": 1,
 				"id": "expenses.core",
 				"package": "@flowdular/module-expenses",
 				"version": "0.6.1",
@@ -373,6 +424,57 @@
 			"manifest": {
 				"$schema": "../../packages/contracts/schemas/module.schema.json",
 				"schemaVersion": 1,
+				"id": "expenses.core",
+				"package": "@flowdular/module-expenses",
+				"version": "0.8.2",
+				"profile": "full",
+				"capabilities": [
+					"api",
+					"database",
+					"client",
+					"translations"
+				],
+				"platform": {
+					"server": true,
+					"client": true
+				},
+				"dependencies": [
+					{
+						"id": "system.core",
+						"range": "^0.8.0"
+					},
+					{
+						"id": "auth.core",
+						"range": "^0.13.0"
+					},
+					{
+						"id": "exports.core",
+						"range": "^0.2.0"
+					}
+				],
+				"requires": [
+					{
+						"id": "exports.lists.v1",
+						"optional": true
+					}
+				],
+				"tenancy": "required",
+				"locales": [
+					"en",
+					"pl"
+				],
+				"stability": "experimental",
+				"platformApi": "^0.1.0"
+			},
+			"artifact": "https://raw.githubusercontent.com/Flowdular/official-modules/f38a67718c5a29aba5b5d37c0504430a3c7f565b/registry/releases/expenses.core/0.8.2.json",
+			"sha256": "1ae49980e83502b26bf7a4fae433361ec485d6b1680fa4671c3a4ad66e4ca711",
+			"sourceCommit": "f38a67718c5a29aba5b5d37c0504430a3c7f565b",
+			"license": "MIT"
+		},
+		{
+			"manifest": {
+				"$schema": "../../packages/contracts/schemas/module.schema.json",
+				"schemaVersion": 1,
 				"id": "parties.core",
 				"package": "@flowdular/module-parties",
 				"version": "0.10.0",
@@ -469,6 +571,57 @@
 			"artifact": "https://raw.githubusercontent.com/Flowdular/official-modules/7eb39ff709b73a80ba4171c87921b56028ddbac3/registry/releases/parties.core/0.10.1.json",
 			"sha256": "6faf2fe1b992cfa90f6d7ce41e6bde35b52f500145870aa1d31ebf38efd13890",
 			"sourceCommit": "7eb39ff709b73a80ba4171c87921b56028ddbac3",
+			"license": "MIT"
+		},
+		{
+			"manifest": {
+				"$schema": "../../packages/contracts/schemas/module.schema.json",
+				"schemaVersion": 1,
+				"id": "parties.core",
+				"package": "@flowdular/module-parties",
+				"version": "0.10.2",
+				"profile": "full",
+				"capabilities": [
+					"api",
+					"database",
+					"client",
+					"translations"
+				],
+				"platform": {
+					"server": true,
+					"client": true
+				},
+				"dependencies": [
+					{
+						"id": "system.core",
+						"range": "^0.8.0"
+					},
+					{
+						"id": "auth.core",
+						"range": "^0.13.0"
+					},
+					{
+						"id": "exports.core",
+						"range": "^0.2.0"
+					}
+				],
+				"requires": [
+					{
+						"id": "exports.lists.v1",
+						"optional": true
+					}
+				],
+				"tenancy": "required",
+				"locales": [
+					"en",
+					"pl"
+				],
+				"stability": "experimental",
+				"platformApi": "^0.1.0"
+			},
+			"artifact": "https://raw.githubusercontent.com/Flowdular/official-modules/f38a67718c5a29aba5b5d37c0504430a3c7f565b/registry/releases/parties.core/0.10.2.json",
+			"sha256": "ebbef7cf60e094e0fceb68c7e88ced7e05477fa6ac694dea240e87195f66fafd",
+			"sourceCommit": "f38a67718c5a29aba5b5d37c0504430a3c7f565b",
 			"license": "MIT"
 		},
 		{
