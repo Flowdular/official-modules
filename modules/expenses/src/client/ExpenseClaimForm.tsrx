@@ -34,7 +34,7 @@ export function ExpenseClaimForm(props: ExpenseClaimFormProps) @{
 						<input
 							class="ui-input"
 							name="title"
-							maxlength={160}
+							maxLength={160}
 							autoFocus
 							required
 						/>
@@ -64,7 +64,7 @@ export function ExpenseClaimForm(props: ExpenseClaimFormProps) @{
 								event.currentTarget.value.toUpperCase(),
 							)}
 							minlength={3}
-							maxlength={3}
+							maxLength={3}
 							required
 						/>
 					</FormField>

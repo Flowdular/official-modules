@@ -838,7 +838,7 @@ export function ExpensesView(props: ExpensesViewProps) @{
 							<textarea
 								class="ui-textarea"
 								name="comment"
-								maxlength={2000}
+								maxLength={2000}
 								value={bulkComment}
 								onInput={(event) => setBulkComment(event.currentTarget.value)}
 							></textarea>

@@ -28,7 +28,7 @@ export function ExpenseDecisionForm(props: ExpenseDecisionFormProps) @{
 					<textarea
 						class="ui-textarea"
 						name="comment"
-						maxlength={2000}
+						maxLength={2000}
 						autoFocus
 						required
 					></textarea>
