@@ -1,10 +1,12 @@
 {
-	"sourceSha256": "f2ad99d5ce144d8a0f05869d71d3b13d611317cede4da8ff1242d0b6da7024db",
+	"sourceSha256": "bef466abce149582f64f654adf38b3d6296e342aca01b3ddd5a90b8ac89266c2",
 	"requirements": [
-		"Preserve source behavior, permissions and migrations byte-for-byte during repository transfer.",
-		"Resolve dependencies from the packed Flowdular SDK in an independent workspace.",
-		"Pass module typecheck, behavior tests and manifest/layout/dependency validation.",
-		"Consume the shared @flowdular/sdk package with public subpath imports, without individually published core packages."
+		"Resolve every SDK import from @flowdular/sdk 0.4.0 and validate under the flowdular 0.4.0 CLI.",
+		"Spell host element DOM properties the way Octane expects, so no dynamic render logs an invalid DOM property.",
+		"Render every list table cell through the shared typed cells with px widths and a priority for each column that may hide.",
+		"Keep the module id, permission ids, SQL namespace, applied migrations and stored record values unchanged.",
+		"Keep the English and Polish bundles aligned and free of incomplete plural families.",
+		"Pass module typecheck, behavior tests and manifest, layout, dependency and translation validation."
 	],
 	"findings": [],
 	"checks": [
