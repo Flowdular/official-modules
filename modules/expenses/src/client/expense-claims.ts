@@ -57,7 +57,7 @@ export function expenseStatusTone(
 }
 
 export function expenseCategoryLabel(category: ExpenseClaimCategory): string {
-	return t('expenses.category.' + category);
+	return t('expenses.category.' + category + '.label');
 }
 
 /* The action column follows capability, not the records in the current

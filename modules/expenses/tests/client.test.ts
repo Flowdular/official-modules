@@ -73,9 +73,9 @@ describe('expense claim client helpers', () => {
 		expect(t('expenses.status.draft')).toBe('Wersja robocza');
 		expect(t('expenses.status.approved')).toBe('Zatwierdzone');
 		expect(t('expenses.status.rejected')).toBe('Odrzucone');
-		expect(t('expenses.category.travel')).toBe('Podróż');
-		expect(t('expenses.category.meals')).toBe('Posiłki');
-		expect(t('expenses.category.other')).toBe('Inne');
+		expect(t('expenses.category.travel.label')).toBe('Podróż');
+		expect(t('expenses.category.meals.label')).toBe('Posiłki');
+		expect(t('expenses.category.other.label')).toBe('Inne');
 		setActiveLocale('en');
 	});
 

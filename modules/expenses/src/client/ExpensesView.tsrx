@@ -104,7 +104,7 @@ function columns(withActions: boolean): readonly TableColumn<ExpensesClaim>[] {
 			key: 'category',
 			header: t('expenses.table.category'),
 			width: withActions ? '10%' : '11%',
-			cell: (claim) => t('expenses.category.' + claim.category),
+			cell: (claim) => t('expenses.category.' + claim.category + '.label'),
 		},
 		{
 			key: 'amount',
@@ -669,10 +669,13 @@ export function ExpensesView(props: ExpensesViewProps) @{
 							disabled={status !== 'idle'}
 							options={[
 								{ value: 'all', label: t('expenses.filters.allCategories') },
-								{ value: 'travel', label: t('expenses.category.travel') },
-								{ value: 'meals', label: t('expenses.category.meals') },
-								{ value: 'equipment', label: t('expenses.category.equipment') },
-								{ value: 'other', label: t('expenses.category.other') },
+								{ value: 'travel', label: t('expenses.category.travel.label') },
+								{ value: 'meals', label: t('expenses.category.meals.label') },
+								{
+									value: 'equipment',
+									label: t('expenses.category.equipment.label'),
+								},
+								{ value: 'other', label: t('expenses.category.other.label') },
 							]}
 							onChange={changeCategoryFilter}
 						/>
