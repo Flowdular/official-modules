@@ -2,6 +2,12 @@ import { useEffect, useMemo } from 'octane';
 import {
 	Alert,
 	Button,
+	CellMuted,
+	CellNumber,
+	CellStack,
+	CellTag,
+	CellText,
+	CellTime,
 	ConfirmDialog,
 	Drawer,
 	Filters,
@@ -13,7 +19,6 @@ import {
 	SearchField,
 	Select,
 	TableCard,
-	Tag,
 	ToastHost,
 	toasts,
 	type TableAction,
@@ -82,67 +87,71 @@ function formValue(form: FormData, key: string): string {
 	return typeof value === 'string' ? value : '';
 }
 
-function columns(withActions: boolean): readonly TableColumn<ExpensesClaim>[] {
+function columns(): readonly TableColumn<ExpensesClaim>[] {
 	return [
 		{
 			key: 'claim',
 			header: t('expenses.table.claim'),
-			width: withActions ? '20%' : '24%',
-			cell: (claim) => <span class="ui-cell">
-				<b>{claim.title}</b>
-				<small class="ui-mono">{claim.id}</small>
-			</span>,
+			width: 'auto',
+			cell: (claim) =>
+				<CellStack primary={claim.title} secondary={claim.id} secondaryMono />,
 		},
 		{
 			key: 'expenseDate',
 			header: t('expenses.table.expenseDate'),
-			width: withActions ? '11%' : '12%',
+			width: '140px',
+			priority: 2,
 			value: (claim) => claim.expenseDate,
-			cell: (claim) => <span class="ui-mono">{claim.expenseDate}</span>,
+			cell: (claim) => <CellTime value={claim.expenseDate} kind="date" />,
 		},
 		{
 			key: 'category',
 			header: t('expenses.table.category'),
-			width: withActions ? '10%' : '11%',
-			cell: (claim) => t('expenses.category.' + claim.category + '.label'),
+			width: '130px',
+			priority: 2,
+			cell: (claim) =>
+				<CellText
+					value={t('expenses.category.' + claim.category + '.label')}
+				/>,
 		},
 		{
 			key: 'amount',
 			header: t('expenses.table.amount'),
-			width: withActions ? '10%' : '11%',
+			width: '140px',
 			numeric: true,
 			value: (claim) => claim.amountMinor,
-			cell: (claim) => formatExpenseAmount(claim.amountMinor, claim.currency),
+			cell: (claim) =>
+				<CellNumber
+					value={formatExpenseAmount(claim.amountMinor, claim.currency)}
+				/>,
 		},
 		{
 			key: 'status',
 			header: t('expenses.table.status'),
-			width: withActions ? '10%' : '11%',
+			width: '130px',
 			cell: (claim) =>
-				<Tag tone={expenseStatusTone(claim.status)} dot>{t(
-					'expenses.status.' + claim.status,
-				)}</Tag>,
+				<CellTag
+					tone={expenseStatusTone(claim.status)}
+					dot
+					label={t('expenses.status.' + claim.status)}
+				/>,
 		},
 		{
 			key: 'decisionComment',
 			header: t('expenses.table.decisionComment'),
-			width: withActions ? '15%' : '17%',
+			width: '220px',
+			priority: 3,
 			cell: (claim) => claim.decisionComment
-				? claim.decisionComment
-				: <span class="ui-cell__muted">{t(
-						'expenses.table.noDecisionComment',
-					)}</span>,
+				? <CellText value={claim.decisionComment} wrap />
+				: <CellMuted>{t('expenses.table.noDecisionComment')}</CellMuted>,
 		},
 		{
 			key: 'createdAt',
 			header: t('expenses.table.created'),
-			width: withActions ? '12%' : '14%',
+			width: '140px',
+			priority: 3,
 			value: (claim) => claim.createdAt,
-			cell: (claim) => <span
-				class="ui-mono"
-			>{new Intl.DateTimeFormat(activeLocale(), {
-				dateStyle: 'medium',
-			}).format(claim.createdAt)}</span>,
+			cell: (claim) => <CellTime value={claim.createdAt} kind="date" />,
 		},
 	];
 }
@@ -682,7 +691,7 @@ export function ExpensesView(props: ExpensesViewProps) @{
 					</Filters>}
 					caption={t('expenses.table.caption')}
 					mode="server"
-					columns={columns(showActionColumn)}
+					columns={columns()}
 					rows={claims}
 					rowKey={(claim) => claim.id}
 					sorting
