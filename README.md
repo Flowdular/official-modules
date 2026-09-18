@@ -15,15 +15,15 @@ Install the modules your business needs, keep their source in your workspace, an
 
 This repository owns the official business modules and their versioned source releases. [Flowdular core](https://github.com/Flowdular/flowdular) owns authentication, the runtime, shared UI, agents, sandbox and CLI. The [website](https://github.com/Flowdular/landing) lives separately.
 
-> **Compatibility:** this repository uses the published `@flowdular/sdk@0.1.0` and `flowdular@0.1.0`. All three modules currently declare experimental stability and platform API `0.1.0`.
+> **Compatibility:** this repository uses the published `@flowdular/sdk@0.4.0` and `flowdular@0.4.0`. All three modules declare experimental stability and platform API `^0.1.0`, and depend on `auth.core`, `system.core` and `exports.core` from the platform.
 
 ## Available modules
 
-| Module   | ID              | Version | Source                                            |
-| -------- | --------------- | ------- | ------------------------------------------------- |
-| Expenses | `expenses.core` | `0.6.1` | [Expense records and workflows](modules/expenses) |
-| Parties  | `parties.core`  | `0.8.1` | [Business party records](modules/parties)         |
-| Catalog  | `catalog.core`  | `0.6.1` | [Catalog records](modules/catalog)                |
+| Module   | ID              | Version  | Source                                            |
+| -------- | --------------- | -------- | ------------------------------------------------- |
+| Expenses | `expenses.core` | `0.8.2`  | [Expense records and workflows](modules/expenses) |
+| Parties  | `parties.core`  | `0.10.2` | [Business party records](modules/parties)         |
+| Catalog  | `catalog.core`  | `0.8.2`  | [Catalog records](modules/catalog)                |
 
 Each module includes its specification, server and client code, English and Polish translations, migrations and tests. The existing `.core` IDs are preserved for compatibility; they do not mean the source must remain in the core repository.
 
@@ -36,8 +36,8 @@ pnpm flowdular module search
 pnpm flowdular module info expenses.core
 
 # Inspect the installation plan, then write the reviewed source.
-pnpm flowdular module install expenses.core@0.6.1
-pnpm flowdular module install expenses.core@0.6.1 --apply
+pnpm flowdular module install expenses.core@0.8.2
+pnpm flowdular module install expenses.core@0.8.2 --apply
 
 # Compose the installed module into your application.
 pnpm flowdular module enable expenses.core --apply
@@ -106,7 +106,7 @@ CI runs module validation and tests, PostgreSQL tests with restricted runtime ro
 
 [MIT](LICENSE). Module source remains available in the installed workspace.
 
-The npm surface is three packages: `@flowdular/sdk`, `flowdular` and `create-flowdular`. Modules here depend on the SDK; UI comes from `@flowdular/sdk/ui`. Module releases before the shared SDK transition remain in history; use the current versions listed above.
+The npm surface is four packages: `@flowdular/sdk`, `flowdular`, `create-flowdular` and `@flowdular/sandbox`. Modules here depend on the SDK; UI comes from `@flowdular/sdk/ui`, including the typed table cells their list screens use. Module releases before the shared SDK transition remain in history; use the current versions listed above.
 
 ## Agent-assisted contributions
 
