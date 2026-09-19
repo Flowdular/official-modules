@@ -17,3 +17,6 @@ minimumReleaseAgeExclude:
   - '@flowdular/sdk@0.4.0'
   - flowdular@0.4.0
   - create-flowdular@0.4.0
+  - '@flowdular/sdk@0.4.3'
+  - flowdular@0.4.3
+  - create-flowdular@0.4.3

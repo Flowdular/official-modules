@@ -1,6 +1,6 @@
 schemaVersion: 1
 id: expenses.core
-specVersion: 0.8.2
+specVersion: 0.8.3
 status: approved
 name: Expense Claims
 description: Provides tenant-scoped expense claims with employee ownership, submission, manager decisions, status filtering, and approval reporting.
@@ -14,7 +14,7 @@ dependencies:
   - id: system.core
     range: ^0.8.0
   - id: auth.core
-    range: ^0.13.0
+    range: ^0.14.0
   - id: exports.core
     range: ^0.2.0
 requires:
