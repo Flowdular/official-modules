@@ -1,7 +1,7 @@
 {
-	"sourceSha256": "7aa017caf452bd7aaa964b9060beb8f9bd98a29aa6446e2b79e506dce3b12dd1",
+	"sourceSha256": "90bc364f514aec3e8ae9525eaf4517af8d87dc94227579d63de754e5f80996f4",
 	"requirements": [
-		"Resolve every SDK import from @flowdular/sdk 0.4.0 and validate under the flowdular 0.4.0 CLI.",
+		"Resolve every SDK import from @flowdular/sdk 0.4.3 and validate under the flowdular 0.4.3 CLI.",
 		"Spell host element DOM properties the way Octane expects, so no dynamic render logs an invalid DOM property.",
 		"Render every list table cell through the shared typed cells with px widths and a priority for each column that may hide.",
 		"Keep the module id, permission ids, SQL namespace, applied migrations and stored record values unchanged.",

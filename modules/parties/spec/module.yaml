@@ -1,6 +1,6 @@
 schemaVersion: 1
 id: parties.core
-specVersion: 0.10.2
+specVersion: 0.10.3
 status: approved
 name: Business Parties Core
 description: Provides the tenant-scoped customer and supplier master data used by commercial ERP modules.
@@ -14,7 +14,7 @@ dependencies:
   - id: system.core
     range: ^0.8.0
   - id: auth.core
-    range: ^0.13.0
+    range: ^0.14.0
   - id: exports.core
     range: ^0.2.0
 requires:
